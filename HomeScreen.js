@@ -3,27 +3,34 @@ import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, ImageB
 
 export default function HomeScreen() {
   return (
+    // ScrollView permite deslizar la pantalla hacia abajo si las tarjetas no caben en pantallas chicas
     <ScrollView style={styles.container}>
+      
+      {/* CUADRO DE BÚSQUEDA */}
       <View style={styles.searchContainer}>
         <TextInput 
           placeholder="Buscar recetas" 
           placeholderTextColor="#777"
-          style={styles.input} 
+          style={styles.input} // Campo de texto estilizado tipo buscador moderno
         />
       </View>
 
+      {/* TARJETA 1: CATEGORÍAS */}
       <TouchableOpacity style={styles.card}>
+        {/* ImageBackground permite poner texto y filtros directamente encima de una imagen de internet */}
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?q=80&w=600' }} 
           style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 15 }}
+          imageStyle={{ borderRadius: 15 }} // Aplica esquinas redondeadas directamente al mapa de bits de la foto
         >
+          {/* Filtro oscuro para opacar la imagen y lograr que el texto blanco se lea sin forzar la vista */}
           <View style={styles.filtroOscuro}>
             <Text style={styles.cardTexto}>Categorías</Text>
           </View>
         </ImageBackground>
       </TouchableOpacity>
       
+      {/* TARJETA 2: CREAR RECETA */}
       <TouchableOpacity style={styles.card}>
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?q=80&w=600' }} 
@@ -36,6 +43,7 @@ export default function HomeScreen() {
         </ImageBackground>
       </TouchableOpacity>
 
+      {/* TARJETA 3: MIS RECETAS */}
       <TouchableOpacity style={styles.card}>
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?q=80&w=600' }} 
@@ -52,15 +60,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 15, 
-    backgroundColor: '#F5F4EE' 
-  },
-  searchContainer: { 
-    marginBottom: 20, 
-    marginTop: 10 
-  },
+  container: { flex: 1, padding: 15, backgroundColor: '#F5F4EE' },
+  searchContainer: { marginBottom: 20, marginTop: 10 },
   input: { 
     backgroundColor: '#fff', 
     padding: 12, 
@@ -74,23 +75,15 @@ const styles = StyleSheet.create({
     height: 140, 
     marginBottom: 15,
     borderRadius: 15,
-    overflow: 'hidden', 
+    overflow: 'hidden', // CRUCIAL: Recorta la imagen de fondo para que respete las esquinas redondeadas de la tarjeta
     elevation: 3, 
   },
-  backgroundImage: { 
-    flex: 1, 
-    justifyContent: 'center' 
-  },
+  backgroundImage: { flex: 1, justifyContent: 'center' },
   filtroOscuro: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.25)', // Capa negra con 25% de opacidad
     justifyContent: 'center',
     alignItems: 'center'
   },
-  cardTexto: { 
-    color: '#fff', 
-    fontSize: 26, 
-    fontWeight: 'bold',
-    letterSpacing: 0.5
-  }
+  cardTexto: { color: '#fff', fontSize: 26, fontWeight: 'bold', letterSpacing: 0.5 }
 });
