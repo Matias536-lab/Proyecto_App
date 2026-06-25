@@ -1,36 +1,81 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { ImageBackground } from 'react-native';
 
-// Recibimos también navegarA aquí por si en el futuro quieren poner un botón de "Volver al inicio"
-export default function PerfilScreen({ navegarA }) {
+export default function ProfileScreen() {
   return (
-    <View style={styles.pantallaGenerica}>
-      <Text style={styles.textoPantalla}>Espacio de Perfil</Text>
-      
-      {/* Botón añadido para darle utilidad práctica a la navegación y probar los parámetros */}
-      <TouchableOpacity style={styles.botonVolver} onPress={() => navegarA('Inicio')}>
-        <Text style={styles.textoBoton}>Ir a Inicio</Text>
-      </TouchableOpacity>
-    </View>
-  );
+            <View style={styles.container}>
+              <View style={styles.icono}>
+                <ImageBackground 
+                        source={{ uri: 'https://unsplash.com/es/ilustraciones/marcador-de-posicion-de-imagen-de-perfil-para-una-persona-desconocida-x9LSAQ7_V1s' }} 
+                        style={styles.backgroundImage}
+                        imageStyle={{borderRadius: 15}}
+                      ></ImageBackground>
+                      </View>
+                      
+              <View style={styles.card}>
+                <Text style={styles.titulo}>Nombre de cuenta</Text>
+              </View>
+            </View>
+          );
 }
 
 const styles = StyleSheet.create({
-  pantallaGenerica: { 
-    flex: 1, 
-    backgroundColor: '#F5F4EE', 
-    justifyContent: 'center', 
+  header: {
+    height: 60,
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 20 
-  },
-  textoPantalla: { fontSize: 20, color: '#333', fontWeight: '500', marginBottom: 20 },
-  botonVolver: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
     backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E6E4DC'
   },
-  textoBoton: { color: '#555', fontSize: 16, fontWeight: 'bold' }
+  container: { flex: 1,
+  backgroundColor: '#0566b6',
+  justifyContent: 'center',
+  alignItems: 'center', padding: 20 
+  },
+  card: { backgroundColor: '#fff',
+  height: '85%',
+  width: '110%',
+  alignItems: 'center',
+  marginTop: 40 
+  },
+  icono: { backgroundColor: '#524949',
+  borderRadius: 100,
+  width: '55%',
+  height: '26.5%',
+  alignItems: 'center',
+  marginTop: '30%' 
+  },
+  backgroundImage: { flex: 1,
+  justifyContent: 'center' 
+  },
+  titulo: { fontSize: 24,
+  fontWeight: 'bold',
+  color: '#333',
+  marginBottom: 10 
+  },
+  menuBoton: { width: 40,
+  height: 40,
+  justifyContent: 'center' 
+  },
+  menuIcono: { fontSize: 28,
+  color: '#333' 
+  },
+  headerTitulo: { fontSize: 20,
+  fontWeight: 'bold',
+  color: '#333' 
+  },
+  contenidoPrincipal: { flex: 1,
+  position: 'relative' 
+  },
+  pantallaGenerica: { flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center' 
+  },
+  textoPantalla: { fontSize: 18,
+  color: '#666' 
+},
 });

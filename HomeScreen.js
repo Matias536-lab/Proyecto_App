@@ -6,16 +6,16 @@ export default function HomeScreen() {
     // ScrollView permite deslizar la pantalla hacia abajo si las tarjetas no caben en pantallas chicas
     <ScrollView style={styles.container}>
       
-      {/* CUADRO DE BÚSQUEDA */}
+      {/* Barra de busqueda */}
       <View style={styles.searchContainer}>
         <TextInput 
           placeholder="Buscar recetas" 
           placeholderTextColor="#777"
-          style={styles.input} // Campo de texto estilizado tipo buscador moderno
+          style={styles.input}
         />
       </View>
 
-      {/* TARJETA 1: CATEGORÍAS */}
+      {/* Tarjeta de Categorias */}
       <TouchableOpacity style={styles.card}>
         {/* ImageBackground permite poner texto y filtros directamente encima de una imagen de internet */}
         <ImageBackground 
@@ -30,7 +30,7 @@ export default function HomeScreen() {
         </ImageBackground>
       </TouchableOpacity>
       
-      {/* TARJETA 2: CREAR RECETA */}
+      {/* Tarjeta de Crear Receta */}
       <TouchableOpacity style={styles.card}>
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?q=80&w=600' }} 
@@ -43,7 +43,7 @@ export default function HomeScreen() {
         </ImageBackground>
       </TouchableOpacity>
 
-      {/* TARJETA 3: MIS RECETAS */}
+      {/* Tarjeta de mis recetas*/}
       <TouchableOpacity style={styles.card}>
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?q=80&w=600' }} 

@@ -4,9 +4,9 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 export default function ConfiguracionScreen() {
   // Matriz de objetos que simula los datos de configuración. Esto evita repetir código JSX manualmente.
   const opciones = [
-    { id: 1, titulo: 'Notificaciones', subtitulo: 'Configura tus alertas de recetas' },
-    { id: 2, titulo: 'Privacidad', subtitulo: 'Gestiona la visibilidad de tu perfil' },
-    { id: 3, titulo: 'Idioma', subtitulo: 'Español (México)' },
+    { id: 1, titulo: 'Notificaciones', subtitulo: 'Configura las notificaciones recibidas' },
+    { id: 2, titulo: 'Privacidad', subtitulo: 'Gestiona la privacidad de tu perfil' },
+    { id: 3, titulo: 'Idioma', subtitulo: 'Español' },
     { id: 4, titulo: 'Modo Oscuro', subtitulo: 'Desactivado' },
   ];
 
@@ -41,7 +41,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E6E4DC',
   },
-  tituloItem: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  subtituloItem: { fontSize: 14, color: '#777', marginTop: 4 },
-  flecha: { fontSize: 18, color: '#ccc' }
+  tituloItem: { fontSize: 18,
+  fontWeight: 'bold',
+  color: '#333' 
+  },
+  subtituloItem: { fontSize: 14,
+  color: '#777',
+  marginTop: 4 
+  },
+  flecha: { fontSize: 18,
+  color: '#ccc' 
+}
 });

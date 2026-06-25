@@ -8,21 +8,19 @@ import ConfigScreen from './ConfigScreen';
 import CerrarScreen from './CerrarScreen';   
 
 export default function App() {
-  // VARIABLES DE ESTADO (Guardan datos que cambian la interfaz en tiempo real)
-  // menuAbierto: true para mostrar el menú, false para ocultarlo
+  /* Variables estado (Guardan datos que cambian la interfaz en tiempo real)
+     menuAbierto: true para mostrar el menú, false para ocultarlo */
   const [menuAbierto, setMenuAbierto] = useState(false);
   // pantallaActual: guarda el texto de qué sección debe ver el usuario en este momento
   const [pantallaActual, setPantallaActual] = useState('Inicio');
   
-  // FUNCION DE NAVEGACIÓN: Cambia de pantalla y cierra el menú al mismo tiempo
+  // Funcion de navegacion: Cambia de pantalla y cierra el menú al mismo tiempo
   const navegarA = (pantalla) => {
     setPantallaActual(pantalla);
     setMenuAbierto(false); // Cierra el menú lateral automáticamente al tocar una opción
   };
 
-  // SWITCH DINÁMICO: Examina la variable "pantallaActual" y devuelve el componente correspondiente
-  // Nota: A CerrarScreen y PerfilScreen les pasamos la función navegarA como parámetro (Prop) 
-  // para que esos archivos puedan ordenarle a App.js que cambie de pantalla.
+  /* CORREGIDO: Volvimos a declarar el nombre de la función 'renderizarPantalla' */
   const renderizarPantalla = () => {
     switch (pantallaActual) {
       case 'Inicio': 
@@ -44,14 +42,14 @@ export default function App() {
       {/* Configura la barra de notificaciones del celular (hora, batería) con fondo claro */}
       <StatusBar barStyle="dark-content" backgroundColor="#FAF9F6" />
       
-      {/* HEADER (Barra superior fija) */}
+      {/* Header (Barra superior fija) */}
       <View style={styles.header}>
-        {/* Botón de tres líneas (Hamburguesa) para abrir/cerrar el menú */}
+        {/* Aca entra el botón de tres líneas para abrir/cerrar el menú */}
         <TouchableOpacity onPress={() => setMenuAbierto(!menuAbierto)} style={styles.menuBoton}>
           <Text style={styles.menuIcono}>☰</Text>
         </TouchableOpacity>
 
-        {/* TÍTULO DINÁMICO: Cambia el texto del header según la pantalla en la que estemos */}
+        {/* El titulo Cambia el texto del header según la pantalla en la que estemos */}
         <Text style={styles.headerTitulo}>
           {pantallaActual === 'Inicio' ? 'MyKitchen' : 
            pantallaActual === 'Configuracion' ? 'Configuración' : 
@@ -62,13 +60,13 @@ export default function App() {
         <View style={{ width: 40 }} />
       </View>
 
-      {/* CONTENEDOR PRINCIPAL: Aquí se inyecta la pantalla que toque ver */}
+      {/* Contenedor principal: Aquí se implementa la pantalla que toque ver */}
       <View style={styles.contenidoPrincipal}>
         
         {/* Ejecutamos la función de arriba para pintar el componente activo */}
         {renderizarPantalla()}
 
-        {/* MENÚ LATERAL (Se dibuja por encima de la pantalla actual sólo si menuAbierto es true) */}
+        {/* Menu lateral (Se dibuja por encima de la pantalla actual sólo si menuAbierto es true) */}
         {menuAbierto && (
           <View style={styles.drawerOverlay}>
             {/* El cajón blanco con las opciones */}
@@ -104,12 +102,12 @@ export default function App() {
   );
 }
 
-// ARQUITECTURA DE ESTILOS (Equivalente a CSS pero estructurado en objetos de JavaScript)
+// Estilos 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FAF9F6' },
   header: {
     height: 60,
-    flexDirection: 'row', // Distribuye los elementos horizontalmente (como un flexbox de CSS)
+    flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
@@ -122,22 +120,22 @@ const styles = StyleSheet.create({
   headerTitulo: { fontSize: 20, fontWeight: 'bold', color: '#333' },
   contenidoPrincipal: { flex: 1, position: 'relative' },
   
-  /* DISEÑO DEL DRAWER (Efecto de capa flotante) */
+  /* Diseño del drawer */
   drawerOverlay: { 
-    position: 'absolute', // Hace flotar el menú por encima del contenido del fondo
+    position: 'absolute', 
     top: 0, left: 0, right: 0, bottom: 0, 
     flexDirection: 'row', 
-    zIndex: 999 // Asegura que esté en el nivel más alto de la pantalla
+    zIndex: 999 
   },
   drawer: { 
     width: '70%', 
     backgroundColor: '#fff', 
     height: '100%', 
     padding: 20, 
-    elevation: 16, // Crea la sombra proyectada en Android
-    shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3.84 // Sombras para iOS
+    elevation: 16, 
+    shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3.84 
   },
-  cierreFalso: { width: '30%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)' }, // Fondo negro translúcido
+  cierreFalso: { width: '30%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)' }, 
   drawerTitulo: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#333', marginTop: 20 },
   linea: { height: 1, backgroundColor: '#eee', marginBottom: 20 },
   drawerItem: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#f9f9f9' },
