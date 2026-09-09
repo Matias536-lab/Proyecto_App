@@ -1,81 +1,196 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { ImageBackground } from 'react-native';
+import { StyleSheet, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { ImageBackground } from "react-native";
 
 export default function ProfileScreen() {
   return (
-            <View style={styles.container}>
-              <View style={styles.icono}>
-                <ImageBackground 
-                        source={{ uri: 'https://unsplash.com/es/ilustraciones/marcador-de-posicion-de-imagen-de-perfil-para-una-persona-desconocida-x9LSAQ7_V1s' }} 
-                        style={styles.backgroundImage}
-                        imageStyle={{borderRadius: 15}}
-                      ></ImageBackground>
-                      </View>
-                      
-              <View style={styles.card}>
-                <Text style={styles.titulo}>Nombre de cuenta</Text>
-              </View>
-            </View>
-          );
+    <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.opcion}>
+            <Text style={styles.textoEdit}>[Editar perfil]</Text>
+          </TouchableOpacity>
+      <View style={styles.icono}>
+        <ImageBackground
+          source={{
+            uri: "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+          }}
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 100 }}
+        />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.titulo}>Nombre de cuenta</Text>
+        <Text style={styles.any}>Descripcion</Text>
+
+        <View style={styles.datos}>
+          <TouchableOpacity style={styles.dato}>
+            <Text style={styles.numero}>8</Text>
+            <Text style={styles.textoDatos}>Favoritos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.dato}>
+            <Text style={styles.numero}>7</Text>
+            <Text style={styles.textoDatos}>Recetas</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.linea}/>
+        <View style={styles.categorias}>
+          <Text style={styles.tituloRecetas}>Recetas creadas</Text>
+          < TouchableOpacity  style={styles.categoria}>
+          < ImageBackground
+          source={{ uri: '' }}
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 15 }}>
+          < View  style={styles.filtroOscuro}>
+          < Text  style={styles.textoCategoria}>Desayunos</ Text >
+          <Text style={styles.cantidad}>2</Text>
+          </ View >
+          </ ImageBackground >
+          </ TouchableOpacity >
+
+          
+          < TouchableOpacity  style={styles.categoria}>
+          < ImageBackground source={{ uri: '' }}
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 15 }}>
+          < View  style={styles.filtroOscuro}>
+          < Text  style={styles.textoCategoria}>Almuerzos</ Text >
+          <Text style={styles.cantidad}>4</Text>
+          </ View >
+          </ ImageBackground >
+          </ TouchableOpacity >
+
+
+          < TouchableOpacity  style={styles.categoria}>
+          < ImageBackground source={{ uri: '' }}
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 15 }}>
+          < View  style={styles.filtroOscuro}>
+          < Text  style={styles.textoCategoria}>Meriendas</ Text >
+          <Text style={styles.cantidad}>0</Text>
+          </ View >
+          </ ImageBackground >
+          </ TouchableOpacity >
+          
+
+          < TouchableOpacity  style={styles.categoria}>
+          < ImageBackground source={{ uri: '' }}
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 15 }}>
+          < View  style={styles.filtroOscuro}>
+          < Text  style={styles.textoCategoria}>Cenas</ Text >
+          <Text style={styles.cantidad}>1</Text>
+          </ View >
+          </ ImageBackground >
+          </ TouchableOpacity >
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fff',
+  container: {
+    flex: 1,
+    backgroundColor: "#0566b6cb",
   },
-  container: { flex: 1,
-  backgroundColor: '#0566b6',
-  justifyContent: 'center',
-  alignItems: 'center', padding: 20 
+  card: {
+    backgroundColor: "#fff",
+    height: "80%",
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20,
+    borderRadius: 15,
+    padding: 20,
   },
-  card: { backgroundColor: '#fff',
-  height: '85%',
-  width: '110%',
-  alignItems: 'center',
-  marginTop: 40 
+  icono: {
+    backgroundColor: "#fff",
+    borderRadius: 100,
+    width: 150,
+    height: 150,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    alignSelf: 'center',
   },
-  icono: { backgroundColor: '#524949',
-  borderRadius: 100,
-  width: '55%',
-  height: '26.5%',
-  alignItems: 'center',
-  marginTop: '30%' 
+  categoria: {
+    height: 100,
+    width: 300,
+    marginBottom: 15,
+    borderRadius: 15,
+    overflow: 'hidden',
   },
-  backgroundImage: { flex: 1,
-  justifyContent: 'center' 
+  textoCategoria: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+
   },
-  titulo: { fontSize: 24,
-  fontWeight: 'bold',
-  color: '#333',
-  marginBottom: 10 
+  filtroOscuro: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  menuBoton: { width: 40,
-  height: 40,
-  justifyContent: 'center' 
+  backgroundImage: {
+    width: "100%",
+    height: "100%",
   },
-  menuIcono: { fontSize: 28,
-  color: '#333' 
+  titulo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
   },
-  headerTitulo: { fontSize: 20,
-  fontWeight: 'bold',
-  color: '#333' 
+  opcion: {
+    marginLeft: 30,
   },
-  contenidoPrincipal: { flex: 1,
-  position: 'relative' 
+  tituloRecetas:{
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333333bd",
+    marginBottom: 10,
+    alignSelf: 'center',
   },
-  pantallaGenerica: { flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center' 
+  any: {
+    fontSize: 16,
+    color: "#666",
   },
-  textoPantalla: { fontSize: 18,
-  color: '#666' 
-},
+  datos: {
+    backgroundColor: "#fff",
+    width: 370,
+    height: 70,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+  },
+  dato: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  numero: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  cantidad:{
+    fontsize:22,
+    color: "#fff",
+  },
+  textoDatos: {
+    fontSize: 16,
+    color: "#333",
+    marginTop: 2,
+  },
+  textoEdit: {
+    color: "#fff",
+    fontSize: 16,
+    marginLeft: 285,
+  },
+  linea: {
+    height: 1,
+    width: 420,
+    backgroundColor: "#2218184d",
+    marginBottom: 20
+  },
 });

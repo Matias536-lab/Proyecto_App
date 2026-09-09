@@ -4,9 +4,9 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 export default function ConfiguracionScreen() {
   // Matriz de objetos que simula los datos de configuración. Esto evita repetir código JSX manualmente.
   const opciones = [
-    { id: 1, titulo: 'Notificaciones', subtitulo: 'Configura las notificaciones recibidas' },
+    { id: 1, titulo: 'Notificaciones', subtitulo: 'Configuraciones recibidas' },
     { id: 2, titulo: 'Privacidad', subtitulo: 'Gestiona la privacidad de tu perfil' },
-    { id: 3, titulo: 'Idioma', subtitulo: 'Español' },
+    { id: 3, titulo: 'Idioma', subtitulo: 'Español Latino' },
     { id: 4, titulo: 'Modo Oscuro', subtitulo: 'Desactivado' },
   ];
 
