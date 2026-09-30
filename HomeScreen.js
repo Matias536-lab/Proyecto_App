@@ -20,7 +20,7 @@ export default function HomeScreen({ navegarA }) {
     <ScrollView style={styles.container}>
       <View style={styles.searchContainer}>
         <TextInput
-          placeholder="Buscar Comida"
+          placeholder="Buscar receta"
           placeholderTextColor="#777"
           style={styles.input}
           value={busqueda}
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15
   },
   botonBuscar: {
-    backgroundColor: '#0566b6',
+    backgroundColor: '#9C4221',
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',

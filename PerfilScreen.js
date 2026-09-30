@@ -1,13 +1,39 @@
-import { StyleSheet, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 
-export default function ProfileScreen() {
-  return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.opcion}>
-            <Text style={styles.textoEdit}>[Editar perfil]</Text>
+// Pantalla "Mi Cuenta".
+//
+// Recibe el usuario desde App.js. Si no hay sesión abierta, en vez de
+// mostrar datos vacíos invita a iniciar sesión.
+export default function PerfilScreen({ navegarA, usuario }) {
+  if (!usuario) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.titulo}>No hay sesión abierta</Text>
+          <Text style={styles.subtitulo}>
+            Iniciá sesión para ver los datos de tu cuenta.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.boton}
+            onPress={() => navegarA("Login")}
+          >
+            <Text style={styles.botonTexto}>Iniciar sesión</Text>
           </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
       <View style={styles.icono}>
         <ImageBackground
           source={{
@@ -19,178 +45,107 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.titulo}>Nombre de cuenta</Text>
-        <Text style={styles.any}>Descripcion</Text>
+        <Text style={styles.titulo}>{usuario.nombre}</Text>
 
-        <View style={styles.datos}>
-          <TouchableOpacity style={styles.dato}>
-            <Text style={styles.numero}>8</Text>
-            <Text style={styles.textoDatos}>Favoritos</Text>
-          </TouchableOpacity>
+        {usuario.email ? (
+          <Text style={styles.email}>{usuario.email}</Text>
+        ) : null}
 
-          <TouchableOpacity style={styles.dato}>
-            <Text style={styles.numero}>7</Text>
-            <Text style={styles.textoDatos}>Recetas</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.linea}/>
-        <View style={styles.categorias}>
-          <Text style={styles.tituloRecetas}>Recetas creadas</Text>
-          < TouchableOpacity  style={styles.categoria}>
-          < ImageBackground
-          source={{ uri: '' }}
-          style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 15 }}>
-          < View  style={styles.filtroOscuro}>
-          < Text  style={styles.textoCategoria}>Desayunos</ Text >
-          <Text style={styles.cantidad}>2</Text>
-          </ View >
-          </ ImageBackground >
-          </ TouchableOpacity >
+        <View style={styles.linea} />
 
-          
-          < TouchableOpacity  style={styles.categoria}>
-          < ImageBackground source={{ uri: '' }}
-          style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 15 }}>
-          < View  style={styles.filtroOscuro}>
-          < Text  style={styles.textoCategoria}>Almuerzos</ Text >
-          <Text style={styles.cantidad}>4</Text>
-          </ View >
-          </ ImageBackground >
-          </ TouchableOpacity >
+        <Text style={styles.dato}>Sesión abierta en este dispositivo.</Text>
 
-
-          < TouchableOpacity  style={styles.categoria}>
-          < ImageBackground source={{ uri: '' }}
-          style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 15 }}>
-          < View  style={styles.filtroOscuro}>
-          < Text  style={styles.textoCategoria}>Meriendas</ Text >
-          <Text style={styles.cantidad}>0</Text>
-          </ View >
-          </ ImageBackground >
-          </ TouchableOpacity >
-          
-
-          < TouchableOpacity  style={styles.categoria}>
-          < ImageBackground source={{ uri: '' }}
-          style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 15 }}>
-          < View  style={styles.filtroOscuro}>
-          < Text  style={styles.textoCategoria}>Cenas</ Text >
-          <Text style={styles.cantidad}>1</Text>
-          </ View >
-          </ ImageBackground >
-          </ TouchableOpacity >
-        </View>
+        <TouchableOpacity
+          style={styles.botonSecundario}
+          onPress={() => navegarA("CerrarSesion")}
+        >
+          <Text style={styles.botonSecundarioTexto}>Cerrar sesión</Text>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0566b6cb",
-  },
-  card: {
-    backgroundColor: "#fff",
-    height: "80%",
-    width: "100%",
+    backgroundColor: "#9C4221",
     alignItems: "center",
-    marginTop: 20,
-    borderRadius: 15,
     padding: 20,
   },
   icono: {
     backgroundColor: "#fff",
     borderRadius: 100,
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: "10%",
     overflow: "hidden",
-    alignSelf: 'center',
-  },
-  categoria: {
-    height: 100,
-    width: 300,
-    marginBottom: 15,
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
-  textoCategoria: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-
-  },
-  filtroOscuro: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   backgroundImage: {
     width: "100%",
     height: "100%",
   },
+  card: {
+    backgroundColor: "#fff",
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20,
+    borderRadius: 15,
+    padding: 25,
+  },
   titulo: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 10,
+    textAlign: "center",
   },
-  opcion: {
-    marginLeft: 30,
+  email: {
+    fontSize: 15,
+    color: "#777",
+    marginTop: 6,
   },
-  tituloRecetas:{
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333333bd",
-    marginBottom: 10,
-    alignSelf: 'center',
-  },
-  any: {
-    fontSize: 16,
+  subtitulo: {
+    fontSize: 15,
     color: "#666",
-  },
-  datos: {
-    backgroundColor: "#fff",
-    width: 370,
-    height: 70,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
-  dato: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  numero: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  cantidad:{
-    fontsize:22,
-    color: "#fff",
-  },
-  textoDatos: {
-    fontSize: 16,
-    color: "#333",
-    marginTop: 2,
-  },
-  textoEdit: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 285,
+    textAlign: "center",
+    marginTop: 10,
   },
   linea: {
     height: 1,
-    width: 420,
-    backgroundColor: "#2218184d",
-    marginBottom: 20
+    backgroundColor: "#E6E4DC",
+    alignSelf: "stretch",
+    marginVertical: 20,
+  },
+  dato: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+  },
+  boton: {
+    backgroundColor: "#9C4221",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    marginTop: 25,
+  },
+  botonTexto: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  botonSecundario: {
+    borderWidth: 1,
+    borderColor: "#A8322E",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    marginTop: 25,
+  },
+  botonSecundarioTexto: {
+    color: "#A8322E",
+    fontSize: 15,
+    fontWeight: "bold",
   },
 });

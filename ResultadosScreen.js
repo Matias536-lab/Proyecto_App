@@ -14,13 +14,10 @@ import { buscarLocal, recetasPorCategoria, buscarEnInternet } from './api';
 
 // Convierte a texto lo que nos manden, venga como venga.
 //
-// Esto existe porque la búsqueda puede llegar de dos formas distintas
-// según qué versión de App.js esté en uso:
-//   - como texto:  "pollo"
-//   - como objeto: { busqueda: "pollo" }
-// Si intentáramos mostrar el objeto directamente, React se rompe con el error
-// "Objects are not valid as a React child". Así nos aseguramos de que
-// SIEMPRE terminemos con un texto.
+// La búsqueda puede llegar de dos formas según qué versión de App.js
+// esté en uso: como texto ("pollo") o como objeto ({ busqueda: "pollo" }).
+// Si intentáramos mostrar el objeto directamente, React se rompe con
+// "Objects are not valid as a React child". Así siempre terminamos con texto.
 function obtenerTexto(valor) {
     if (!valor) return '';
     if (typeof valor === 'string') return valor;
@@ -28,8 +25,7 @@ function obtenerTexto(valor) {
     return '';
 }
 
-export default function ResultadosScreen({ navegarA, busqueda, route }) {
-    // Probamos las dos formas posibles y nos quedamos con la primera que dé texto.
+export default function ResultadosScreen({ navegarA, busqueda, route, buscarInternet }) {
     const textoBuscado =
         obtenerTexto(busqueda) ||
         obtenerTexto(route && route.busqueda) ||
@@ -39,21 +35,9 @@ export default function ResultadosScreen({ navegarA, busqueda, route }) {
         route && typeof route.categoria === 'string' ? route.categoria : '';
 
     // --- ESTADOS ---
-    // Resultados que vienen de internet
     const [resultadosApi, setResultadosApi] = useState([]);
-    // Mientras esperamos la respuesta de la API
     const [cargando, setCargando] = useState(false);
-    // Si algo falló, guardamos el mensaje para mostrárselo al usuario
     const [error, setError] = useState('');
-    // Para saber si el usuario ya apretó el botón de buscar en internet
-    const [yaBusqueEnInternet, setYaBusqueEnInternet] = useState(false);
-
-    // Si cambia la búsqueda, limpiamos lo anterior.
-    useEffect(() => {
-        setResultadosApi([]);
-        setError('');
-        setYaBusqueEnInternet(false);
-    }, [textoBuscado, categoriaBuscada]);
 
     // --- BÚSQUEDA EN NUESTRAS RECETAS ---
     // Es instantánea: no necesita internet ni esperar a nadie.
@@ -61,31 +45,56 @@ export default function ResultadosScreen({ navegarA, busqueda, route }) {
         ? recetasPorCategoria(categoriaBuscada)
         : buscarLocal(textoBuscado);
 
-    // --- BÚSQUEDA EN INTERNET ---
-    const buscarMas = async () => {
-        setCargando(true);
+    // --- BÚSQUEDA EN INTERNET, AUTOMÁTICA ---
+    //
+    // Antes esto lo disparaba un botón. Ahora arranca solo, apenas se
+    // entra a la pantalla, y corre EN PARALELO con la búsqueda local.
+    // Por eso los resultados propios ya se ven mientras internet responde.
+    //
+    // Solo se busca en internet cuando el usuario escribió algo.
+    // Si entró por una categoría (Desayuno, Cena...) no corresponde:
+    // esas categorías son nuestras y la API no las conoce.
+    useEffect(() => {
+        setResultadosApi([]);
         setError('');
-        setYaBusqueEnInternet(true);
 
-        try {
-            const encontradas = await buscarEnInternet(textoBuscado);
-            setResultadosApi(encontradas);
-        } catch (e) {
-            // Mostramos el mensaje de error en vez de dejar que la app se rompa
-            setError(e.message || 'Ocurrió un error al buscar en internet.');
-        }
+        // Si el usuario apagó la búsqueda en internet desde Configuración,
+        // ni siquiera llamamos a la API.
+        if (!textoBuscado || buscarInternet === false) return;
 
-        setCargando(false);
-    };
+        // Si el usuario cambia de búsqueda antes de que llegue la respuesta,
+        // esta marca evita que los resultados viejos pisen a los nuevos.
+        let cancelado = false;
 
-    // Abre la ficha completa de una receta
+        setCargando(true);
+
+        buscarEnInternet(textoBuscado)
+            .then((encontradas) => {
+                if (!cancelado) setResultadosApi(encontradas);
+            })
+            .catch((e) => {
+                if (!cancelado) {
+                    setError(e.message || 'No se pudo buscar en internet.');
+                }
+            })
+            .then(() => {
+                if (!cancelado) setCargando(false);
+            });
+
+        return () => {
+            cancelado = true;
+        };
+    }, [textoBuscado, categoriaBuscada, buscarInternet]);
+
+    // --- UNA SOLA LISTA ---
+    // Primero las nuestras (instantáneas y en español) y después las de
+    // internet. Para el usuario es un único listado de resultados.
+    const todosLosResultados = resultadosLocales.concat(resultadosApi);
+
     const abrirReceta = (receta) => {
         navegarA('DetalleReceta', { receta: receta });
     };
 
-    // Dibuja una tarjeta de receta.
-    // Sin emojis ni imágenes: solo información escrita, que es lo que
-    // le sirve al usuario para decidir si le interesa el plato.
     const renderTarjeta = (receta) => (
         <TouchableOpacity
             key={receta.id}
@@ -95,31 +104,24 @@ export default function ResultadosScreen({ navegarA, busqueda, route }) {
             <View style={styles.cardTextos}>
                 <Text style={styles.nombre}>{receta.nombre}</Text>
 
-                {/* Línea de datos: categoría, tiempo y porciones */}
-                <View style={styles.filaDatos}>
-                    {receta.categoria ? (
-                        <Text style={styles.dato}>{receta.categoria}</Text>
-                    ) : null}
-                    {receta.tiempo ? (
-                        <Text style={styles.dato}>· {receta.tiempo}</Text>
-                    ) : null}
-                    {receta.porciones ? (
-                        <Text style={styles.dato}>· {receta.porciones}</Text>
-                    ) : null}
-                </View>
+                {/* La categoría se muestra solo cuando el usuario está buscando.
+                    Si ya entró a "Desayuno", repetirlo en cada tarjeta sobra. */}
+                {!categoriaBuscada && receta.categoria ? (
+                    <Text style={styles.dato}>{receta.categoria}</Text>
+                ) : null}
 
-                {/* Adelanto de la descripción, recortado a 2 renglones */}
                 {receta.descripcion ? (
                     <Text style={styles.resumen} numberOfLines={2}>
                         {receta.descripcion}
                     </Text>
                 ) : null}
 
-                {/* Cuántos ingredientes y pasos tiene */}
-                <Text style={styles.conteo}>
-                    {(receta.ingredientes || []).length} ingredientes ·{' '}
-                    {(receta.pasos || []).length} pasos
-                </Text>
+                {/* Aviso discreto: las recetas de internet están en inglés.
+                    Va en la tarjeta y no en un bloque aparte, para que la
+                    lista se siga leyendo como una sola. */}
+                {receta.origen === 'api' ? (
+                    <Text style={styles.avisoIdioma}>Receta en inglés</Text>
+                ) : null}
             </View>
 
             <Text style={styles.flecha}>›</Text>
@@ -137,67 +139,44 @@ export default function ResultadosScreen({ navegarA, busqueda, route }) {
                 <Text style={styles.busqueda}>Buscaste: "{textoBuscado}"</Text>
             ) : null}
 
-            {/* ---------- RESULTADOS PROPIOS ---------- */}
-            {resultadosLocales.length > 0 ? (
-                <View>
-                    <Text style={styles.seccion}>
-                        En MyKitchen ({resultadosLocales.length})
-                    </Text>
-                    {resultadosLocales.map(renderTarjeta)}
-                </View>
-            ) : (
-                <View style={styles.sinResultados}>
-                    <Text style={styles.tituloSinResultados}>Sin resultados propios</Text>
-                    <Text style={styles.subtitulo}>
-                        No encontramos recetas de MyKitchen que coincidan con tu búsqueda.
-                    </Text>
-                </View>
-            )}
-
-            {/* ---------- BOTÓN PARA AMPLIAR CON INTERNET ---------- */}
-            {textoBuscado && !yaBusqueEnInternet ? (
-                <TouchableOpacity style={styles.botonInternet} onPress={buscarMas}>
-                    <Text style={styles.botonInternetTexto}>Buscar más en internet</Text>
-                </TouchableOpacity>
+            {/* Contador: se actualiza solo cuando llegan las de internet */}
+            {todosLosResultados.length > 0 ? (
+                <Text style={styles.contador}>
+                    {todosLosResultados.length}{' '}
+                    {todosLosResultados.length === 1 ? 'receta' : 'recetas'}
+                </Text>
             ) : null}
 
-            {/* Mientras carga */}
+            {/* LISTA ÚNICA */}
+            {todosLosResultados.map(renderTarjeta)}
+
+            {/* Mientras esperamos a internet.
+                Va al final de la lista para no tapar lo que ya se ve. */}
             {cargando ? (
                 <View style={styles.cargando}>
-                    <ActivityIndicator size="large" color="#0566b6" />
-                    <Text style={styles.cargandoTexto}>Buscando en internet...</Text>
+                    <ActivityIndicator size="small" color="#9C4221" />
+                    <Text style={styles.cargandoTexto}>Buscando más recetas...</Text>
                 </View>
             ) : null}
 
-            {/* Si hubo un error */}
-            {error ? (
-                <View style={styles.errorCaja}>
-                    <Text style={styles.errorTitulo}>No se pudo completar la búsqueda</Text>
-                    <Text style={styles.errorTexto}>{error}</Text>
-                    <TouchableOpacity style={styles.botonReintentar} onPress={buscarMas}>
-                        <Text style={styles.botonReintentarTexto}>Reintentar</Text>
-                    </TouchableOpacity>
-                </View>
-            ) : null}
-
-            {/* ---------- RESULTADOS DE INTERNET ---------- */}
-            {resultadosApi.length > 0 ? (
-                <View>
-                    <Text style={styles.seccion}>
-                        De internet ({resultadosApi.length})
-                    </Text>
-                    <Text style={styles.aviso}>
-                        Estas recetas vienen de una base internacional, así que están en inglés.
-                    </Text>
-                    {resultadosApi.map(renderTarjeta)}
-                </View>
-            ) : null}
-
-            {/* Buscó en internet, no hubo error, pero no encontró nada */}
-            {yaBusqueEnInternet && !cargando && !error && resultadosApi.length === 0 ? (
-                <Text style={styles.aviso}>
-                    Tampoco encontramos resultados en internet para "{textoBuscado}".
+            {/* Si internet falló: aviso discreto, no un cartel de error.
+                Los resultados propios siguen estando, así que no es una falla
+                total de la búsqueda. */}
+            {error && !cargando ? (
+                <Text style={styles.avisoError}>
+                    No se pudieron traer resultados de internet. {error}
                 </Text>
+            ) : null}
+
+            {/* Nada encontrado en ningún lado */}
+            {todosLosResultados.length === 0 && !cargando ? (
+                <View style={styles.sinResultados}>
+                    <Text style={styles.tituloSinResultados}>Sin resultados</Text>
+                    <Text style={styles.subtitulo}>
+                        No encontramos recetas que coincidan con tu búsqueda.
+                        Probá con otra palabra, por ejemplo "pollo" o "torta".
+                    </Text>
+                </View>
             ) : null}
 
             {/* BOTÓN VOLVER */}
@@ -228,20 +207,13 @@ const styles = StyleSheet.create({
     busqueda: {
         fontSize: 16,
         color: '#666',
+        marginBottom: 4
+    },
+    contador: {
+        fontSize: 14,
+        color: '#9C4221',
+        fontWeight: '600',
         marginBottom: 15
-    },
-    seccion: {
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: '#0566b6',
-        marginTop: 15,
-        marginBottom: 10
-    },
-    aviso: {
-        fontSize: 13,
-        color: '#888',
-        fontStyle: 'italic',
-        marginBottom: 12
     },
     card: {
         backgroundColor: '#fff',
@@ -263,31 +235,45 @@ const styles = StyleSheet.create({
         color: '#333',
         marginBottom: 5
     },
-    filaDatos: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginBottom: 6
-    },
     dato: {
         fontSize: 13,
-        color: '#0566b6',
+        color: '#9C4221',
         fontWeight: '600',
-        marginRight: 5
+        marginBottom: 5
     },
     resumen: {
         fontSize: 14,
         color: '#666',
-        lineHeight: 19,
-        marginBottom: 6
+        lineHeight: 19
     },
-    conteo: {
+    avisoIdioma: {
         fontSize: 12,
-        color: '#999'
+        color: '#999',
+        fontStyle: 'italic',
+        marginTop: 6
     },
     flecha: {
         fontSize: 24,
         color: '#ccc',
         marginLeft: 5
+    },
+    cargando: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12
+    },
+    cargandoTexto: {
+        marginLeft: 10,
+        color: '#777',
+        fontSize: 14
+    },
+    avisoError: {
+        fontSize: 13,
+        color: '#999',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        paddingVertical: 12
     },
     sinResultados: {
         backgroundColor: '#fff',
@@ -307,63 +293,11 @@ const styles = StyleSheet.create({
     subtitulo: {
         fontSize: 15,
         color: '#666',
-        textAlign: 'center'
-    },
-    botonInternet: {
-        backgroundColor: '#fff',
-        borderWidth: 2,
-        borderColor: '#0566b6',
-        paddingVertical: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginTop: 20
-    },
-    botonInternetTexto: {
-        color: '#0566b6',
-        fontSize: 16,
-        fontWeight: 'bold'
-    },
-    cargando: {
-        alignItems: 'center',
-        marginTop: 25
-    },
-    cargandoTexto: {
-        marginTop: 10,
-        color: '#666',
-        fontSize: 15
-    },
-    errorCaja: {
-        backgroundColor: '#FDEDEC',
-        borderRadius: 12,
-        padding: 18,
-        marginTop: 20,
-        borderWidth: 1,
-        borderColor: '#F5C6CB'
-    },
-    errorTitulo: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#d9534f',
-        marginBottom: 6
-    },
-    errorTexto: {
-        fontSize: 14,
-        color: '#8a4f4c',
-        marginBottom: 12
-    },
-    botonReintentar: {
-        backgroundColor: '#d9534f',
-        paddingVertical: 10,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    botonReintentarTexto: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 15
+        textAlign: 'center',
+        lineHeight: 21
     },
     botonVolver: {
-        backgroundColor: '#0566b6',
+        backgroundColor: '#9C4221',
         paddingVertical: 15,
         borderRadius: 12,
         alignItems: 'center',

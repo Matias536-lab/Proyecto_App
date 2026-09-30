@@ -39,9 +39,6 @@ export default function CategoriasScreen({ navegarA }) {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.titulo}>Las 4 comidas del día</Text>
-      <Text style={styles.subtitulo}>
-        Elegí un momento del día y mirá qué podés cocinar
-      </Text>
 
       {CATEGORIAS.map((categoria) => {
         return (
@@ -88,12 +85,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginTop: 2,
-  },
-  subtitulo: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 2,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   card: {
     // Más bajas que las de Inicio: así entran las cuatro
@@ -105,7 +97,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     // Color de respaldo: si la foto no carga, la caja se ve igual
     // de prolija en vez de quedar en blanco.
-    backgroundColor: "#6b7a6e",
+    backgroundColor: "#7A5648",
   },
   imagenFondo: {
     flex: 1,
@@ -126,7 +118,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   botonVolver: {
-    backgroundColor: "#0566b6",
+    backgroundColor: "#9C4221",
     padding: 13,
     borderRadius: 12,
     alignItems: "center",

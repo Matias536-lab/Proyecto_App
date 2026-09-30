@@ -84,7 +84,7 @@ export const RECETAS_LOCALES = [
     nombre: "Yogur con Granola y Frutas",
     categoria: "Desayuno",
     imagen:
-      "https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=800",
+      "https://images.unsplash.com/photo-1614607079542-ec00253243d4?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     tiempo: "5 minutos",
     porciones: "1 porción",
     descripcion:
@@ -109,7 +109,7 @@ export const RECETAS_LOCALES = [
     nombre: "Huevos Revueltos con Queso",
     categoria: "Desayuno",
     imagen:
-      "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800",
+      "https://plus.unsplash.com/premium_photo-1700004501555-319c461aa36b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     tiempo: "8 minutos",
     porciones: "1 porción",
     descripcion:
@@ -135,7 +135,7 @@ export const RECETAS_LOCALES = [
     nombre: "Licuado de Banana y Leche",
     categoria: "Desayuno",
     imagen:
-      "https://images.unsplash.com/photo-1553530666-ba11a7da3888?q=80&w=800",
+      "https://plus.unsplash.com/premium_photo-1695035006295-d37b73003e27?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     tiempo: "5 minutos",
     porciones: "2 porciones",
     descripcion:
@@ -162,7 +162,7 @@ export const RECETAS_LOCALES = [
     nombre: "Milanesa con Puré de Papas",
     categoria: "Almuerzo",
     imagen:
-      "https://images.unsplash.com/photo-1599921841143-819065a55cc6?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Milanesa_con_pur%C3%A9_de_papas.jpg/960px-Milanesa_con_pur%C3%A9_de_papas.jpg",
     tiempo: "45 minutos",
     porciones: "4 porciones",
     descripcion:
@@ -193,7 +193,7 @@ export const RECETAS_LOCALES = [
     nombre: "Empanadas de Carne",
     categoria: "Almuerzo",
     imagen:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Bandeja_de_empanadas_argentinas_de_carne_fritas_servidas_con_limones.jpg/960px-Bandeja_de_empanadas_argentinas_de_carne_fritas_servidas_con_limones.jpg",
     tiempo: "1 hora 15 minutos",
     porciones: "12 empanadas",
     descripcion:
@@ -254,7 +254,7 @@ export const RECETAS_LOCALES = [
     nombre: "Pollo al Horno con Papas",
     categoria: "Almuerzo",
     imagen:
-      "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=800",
+      "https://images.unsplash.com/photo-1599161146640-8d60bd2888e3?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     tiempo: "1 hora 10 minutos",
     porciones: "4 porciones",
     descripcion:
@@ -314,7 +314,7 @@ export const RECETAS_LOCALES = [
     nombre: "Alfajores de Maicena",
     categoria: "Merienda",
     imagen:
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Alfajores-de-maicena-biscuits-recipe.jpg/960px-Alfajores-de-maicena-biscuits-recipe.jpg",
     tiempo: "50 minutos",
     porciones: "18 alfajores",
     descripcion:
@@ -345,7 +345,7 @@ export const RECETAS_LOCALES = [
     nombre: "Torta de Chocolate",
     categoria: "Merienda",
     imagen:
-      "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Quinoa_Chocolate_Cake_CCBYSA2_Karen_Neo.jpg/960px-Quinoa_Chocolate_Cake_CCBYSA2_Karen_Neo.jpg",
     tiempo: "1 hora",
     porciones: "10 porciones",
     descripcion:
@@ -376,7 +376,7 @@ export const RECETAS_LOCALES = [
     nombre: "Budín de Limón",
     categoria: "Merienda",
     imagen:
-      "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?q=80&w=800",
+      "https://images.unsplash.com/photo-1652284300485-c6ae2f5f071a?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     tiempo: "55 minutos",
     porciones: "8 porciones",
     descripcion:
@@ -402,25 +402,30 @@ export const RECETAS_LOCALES = [
   },
   {
     id: "local-14",
-    nombre: "Submarino",
+    nombre: "Galletitas de Avena",
     categoria: "Merienda",
-    imagen:
-      "https://images.unsplash.com/photo-1517578239113-b03992dcdd25?q=80&w=800",
-    tiempo: "7 minutos",
-    porciones: "1 porción",
+    imagen: null,
+    tiempo: "30 minutos",
+    porciones: "20 galletitas",
     descripcion:
-      "Bebida típica de las confiterías argentinas. Se llama así porque la barra de chocolate se hunde en la leche caliente y se derrite lentamente en la taza.",
+      "Galletitas caseras de avena, crocantes por fuera y tiernas por dentro. Se hacen con pocos ingredientes y sin batidora, así que son una buena primera receta para quien recién empieza a cocinar.",
     ingredientes: [
-      "300 ml de leche entera",
-      "1 barra de chocolate semiamargo (30 g)",
-      "1 cucharadita de azúcar (opcional)",
-      "1 pizca de esencia de vainilla",
+      "2 tazas de avena arrollada",
+      "1 taza de harina 0000",
+      "150 g de manteca blanda",
+      "150 g de azúcar rubia",
+      "1 huevo",
+      "1 cucharadita de polvo para hornear",
+      "1 cucharadita de esencia de vainilla",
+      "1 pizca de sal",
     ],
     pasos: [
-      "Calentar la leche hasta que esté bien caliente pero sin llegar a hervir.",
-      "Agregar la esencia de vainilla y el azúcar si se desea.",
-      "Servir la leche en una taza alta.",
-      "Sumergir la barra de chocolate y revolver hasta que se derrita por completo.",
+      "Mezclar la manteca con el azúcar hasta formar una crema.",
+      "Agregar el huevo y la esencia de vainilla, e integrar bien.",
+      "Incorporar la avena, la harina, el polvo para hornear y la sal.",
+      "Formar bolitas con la masa y aplastarlas sobre una placa enmantecada, dejando espacio entre ellas.",
+      "Hornear a 180 °C durante 12 a 15 minutos, hasta que los bordes se doren.",
+      "Dejarlas enfriar sobre la placa: al salir están blandas y endurecen al enfriarse.",
     ],
     origen: "local",
   },
@@ -429,7 +434,7 @@ export const RECETAS_LOCALES = [
     nombre: "Pastafrola",
     categoria: "Merienda",
     imagen:
-      "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Pastafrola.jpg/960px-Pastafrola.jpg",
     tiempo: "1 hora 10 minutos",
     porciones: "10 porciones",
     descripcion:
@@ -461,17 +466,17 @@ export const RECETAS_LOCALES = [
     nombre: "Tarta de Zapallitos y Cebolla",
     categoria: "Cena",
     imagen:
-      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Tarta_de_zapallitos_redondos_y_cebolla_servida_en_un_buffet.jpg/960px-Tarta_de_zapallitos_redondos_y_cebolla_servida_en_un_buffet.jpg",
     tiempo: "50 minutos",
     porciones: "6 porciones",
     descripcion:
-      "Cena liviana y económica que rinde mucho. Se puede comer caliente o fría al día siguiente, y admite cualquier verdura de estación.",
+      "Tarta salada casera de zapallitos de tronco (zapallitos redondos) y cebolla, ligada con huevos revueltos y cubierta con queso muzzarella gratinado. Rinde mucho, es económica y se puede comer caliente o fría al día siguiente.",
     ingredientes: [
       "2 tapas de masa para tarta",
-      "4 zapallitos verdes",
+      "4 zapallitos de tronco (redondos)",
       "2 cebollas",
       "3 huevos",
-      "200 g de queso cremoso",
+      "250 g de queso muzzarella",
       "50 g de queso rallado",
       "Aceite, sal, pimienta y nuez moscada",
     ],
@@ -480,64 +485,65 @@ export const RECETAS_LOCALES = [
       "Rehogar la cebolla en aceite 5 minutos, agregar los zapallitos y cocinar 10 minutos más.",
       "Dejar enfriar y escurrir bien el líquido que soltaron las verduras.",
       "Batir los huevos con el queso rallado, sal, pimienta y nuez moscada.",
-      "Mezclar con las verduras y el queso cremoso en cubos.",
-      "Forrar la tartera con una tapa, volcar el relleno, cubrir con la otra tapa y hornear a 190 °C por 30 minutos.",
+      "Mezclar los huevos batidos con las verduras ya frías.",
+      "Forrar la tartera con una tapa, volcar el relleno y cubrir con la muzzarella en rodajas.",
+      "Hornear a 190 °C durante 30 minutos, hasta que el queso quede gratinado y dorado por encima.",
     ],
     origen: "local",
   },
   {
     id: "local-17",
-    nombre: "Sopa de Verduras",
+    nombre: "Pizza Casera de Muzzarella",
     categoria: "Cena",
-    imagen:
-      "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800",
+    imagen: null,
     tiempo: "40 minutos",
-    porciones: "4 porciones",
+    porciones: "8 porciones",
     descripcion:
-      "Cena reconfortante de invierno, muy baja en calorías y alta en fibra. Sirve para aprovechar verduras que están por pasarse.",
+      "La pizza al molde es una de las cenas más habituales de los viernes en Argentina. La versión porteña se distingue por la masa gruesa y esponjosa y por la cantidad generosa de muzzarella.",
     ingredientes: [
-      "2 zanahorias",
-      "2 papas",
-      "1 zapallo pequeño",
-      "1 cebolla",
-      "1 puerro",
-      "2 ramas de apio",
-      "1,5 litros de caldo de verduras",
-      "Aceite de oliva, sal y pimienta",
+      "2 prepizzas o masas de pizza",
+      "200 ml de salsa de tomate",
+      "400 g de queso muzzarella",
+      "12 aceitunas verdes",
+      "Orégano a gusto",
+      "2 cucharadas de aceite de oliva",
+      "Sal a gusto",
     ],
     pasos: [
-      "Pelar y cortar todas las verduras en cubos parejos de 2 cm.",
-      "Rehogar la cebolla y el puerro en aceite de oliva durante 5 minutos.",
-      "Incorporar el resto de las verduras y saltear 3 minutos.",
-      "Agregar el caldo caliente y llevar a hervor.",
-      "Bajar el fuego y cocinar 25 minutos, hasta que todo esté tierno.",
-      "Condimentar y, si se prefiere crema, procesar con mixer hasta que quede lisa.",
+      "Precalentar el horno a 220 °C.",
+      "Condimentar la salsa de tomate con sal y un poco de orégano.",
+      "Untar la salsa sobre la masa y llevar al horno 10 minutos, sin queso.",
+      "Retirar, cubrir con la muzzarella cortada en rodajas o rallada gruesa.",
+      "Volver al horno 8 minutos, hasta que el queso se funda y burbujee.",
+      "Terminar con las aceitunas, orégano y un hilo de aceite de oliva.",
     ],
     origen: "local",
   },
   {
     id: "local-18",
-    nombre: "Omelette de Jamón y Queso",
+    nombre: "Ensalada de Atún, Huevo y Tomate",
     categoria: "Cena",
-    imagen:
-      "https://images.unsplash.com/photo-1510693206972-df098062cb1d?q=80&w=800",
-    tiempo: "12 minutos",
-    porciones: "1 porción",
+    imagen: null,
+    tiempo: "15 minutos",
+    porciones: "2 porciones",
     descripcion:
-      "La cena más rápida que existe cuando no hay tiempo ni ganas. La clave técnica es el fuego bajo: si se cocina fuerte, se seca y se rompe.",
+      "Cena liviana que no necesita horno ni hornalla más que para los huevos, ideal para los días de calor. El atún aporta proteínas y el huevo la vuelve más saciante que una ensalada común.",
     ingredientes: [
-      "3 huevos",
-      "2 fetas de jamón cocido",
-      "80 g de queso mozzarella",
-      "1 cucharada de manteca",
-      "Sal, pimienta y perejil picado",
+      "1 lata de atún al natural",
+      "2 huevos",
+      "2 tomates",
+      "1 planta de lechuga",
+      "1/2 cebolla",
+      "3 cucharadas de aceite de oliva",
+      "1 cucharada de vinagre",
+      "Sal y pimienta a gusto",
     ],
     pasos: [
-      "Batir los huevos con sal, pimienta y perejil hasta integrar bien.",
-      "Derretir la manteca en una sartén chica a fuego bajo.",
-      "Volcar los huevos y dejar cuajar sin revolver durante 3 minutos.",
-      "Cuando la superficie esté casi seca, distribuir el jamón y el queso sobre una mitad.",
-      "Doblar el omelette al medio y cocinar 1 minuto más para que el queso se derrita.",
+      "Hervir los huevos durante 10 minutos y dejarlos enfriar en agua fría.",
+      "Lavar la lechuga y cortarla en trozos grandes.",
+      "Cortar los tomates en gajos y la cebolla en pluma fina.",
+      "Escurrir bien el atún y desmenuzarlo con un tenedor.",
+      "Armar la ensalada en una fuente, coronar con los huevos en rodajas y condimentar con aceite, vinagre, sal y pimienta.",
     ],
     origen: "local",
   },
@@ -546,7 +552,7 @@ export const RECETAS_LOCALES = [
     nombre: "Guiso de Lentejas",
     categoria: "Cena",
     imagen:
-      "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=800",
+      "https://live.staticflickr.com/6065/6047798921_74931239c8_b.jpg",
     tiempo: "1 hora",
     porciones: "6 porciones",
     descripcion:
@@ -577,7 +583,7 @@ export const RECETAS_LOCALES = [
     nombre: "Zapallitos Rellenos",
     categoria: "Cena",
     imagen:
-      "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800",
+      "https://live.staticflickr.com/4122/4917778820_3707b0e9d8_b.jpg",
     tiempo: "55 minutos",
     porciones: "4 porciones",
     descripcion:

@@ -18,6 +18,8 @@ import CrearRecetasScreen from "./CrearRecetasScreen";
 import MisRecetasScreen from "./MisRecetasScreen";
 import CategoriasScreen from "./CategoriasScreen";
 import DetalleRecetaScreen from "./DetalleRecetaScreen";
+import LoginScreen from "./LoginScreen";
+import RegistroScreen from "./RegistroScreen";
 
 export default function App() {
   // Controla si el menú lateral está abierto o cerrado
@@ -28,6 +30,20 @@ export default function App() {
 
   // Guarda las recetas creadas por el usuario
   const [recetas, setRecetas] = useState([]);
+
+  // ---- PREFERENCIAS DE LA APP ----
+  // Viven acá y no dentro de ConfigScreen, para que no se pierdan
+  // cuando el usuario sale de esa pantalla y vuelve.
+  const [buscarInternet, setBuscarInternet] = useState(true);
+
+  // ---- SESIÓN DEL USUARIO ----
+  // sesionIniciada dice si hay alguien "adentro" de la app.
+  // Arranca en true para que la app se pueda usar de entrada;
+  // al confirmar la salida en CerrarScreen pasa a false.
+  const [sesionIniciada, setSesionIniciada] = useState(true);
+
+  // Datos de quien está usando la app. Es null cuando no hay sesión.
+  const [usuario, setUsuario] = useState({ nombre: "Mi cuenta", email: "" });
 
   // Guarda los datos que una pantalla le manda a otra.
   // Antes solo guardábamos el texto del buscador; ahora es un objeto
@@ -50,6 +66,28 @@ export default function App() {
     setRecetas(recetas.filter((receta) => receta.id !== id));
   };
 
+  // Borrar todas las recetas creadas. La usa Configuración.
+  const borrarTodasLasRecetas = () => {
+    setRecetas([]);
+  };
+
+  // Abre la sesión: guarda los datos y manda al inicio.
+  // La llaman LoginScreen y RegistroScreen cuando los datos son válidos.
+  const iniciarSesion = (datosUsuario) => {
+    setUsuario(datosUsuario);
+    setSesionIniciada(true);
+    navegarA("Inicio");
+  };
+
+  // Cierra la sesión: borra los datos del usuario.
+  // A partir de acá el menú esconde "Mi Cuenta" y muestra
+  // "Iniciar Sesión" y "Registrarse".
+  const cerrarSesion = () => {
+    setUsuario(null);
+    setSesionIniciada(false);
+    navegarA("Inicio");
+  };
+
   // Función para cambiar de pantalla.
   //
   // Acepta dos formas de uso, para no romper el código que ya teníamos:
@@ -59,8 +97,7 @@ export default function App() {
   //   navegarA("Categorias", { categoria: "Desayuno" })
   const navegarA = (pantalla, params = null) => {
     // Si nos mandan un texto suelto, lo convertimos en objeto automáticamente
-    const parametros =
-      typeof params === "string" ? { busqueda: params } : params;
+    const parametros = typeof params === "string" ? { busqueda: params } : params;
 
     setPantallaActual(pantalla);
     setParametrosNavegacion(parametros);
@@ -74,13 +111,36 @@ export default function App() {
         return <HomeScreen navegarA={navegarA} />;
 
       case "Perfil":
-        return <PerfilScreen navegarA={navegarA} />;
+        // Si no hay sesión, no tiene sentido mostrar el perfil:
+        // mandamos directo a iniciar sesión.
+        if (!sesionIniciada) {
+          return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+        }
+        return <PerfilScreen navegarA={navegarA} usuario={usuario} />;
+
+      case "Login":
+        return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+
+      case "Registro":
+        return <RegistroScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
 
       case "Configuracion":
-        return <ConfigScreen navegarA={navegarA} />;
+        return (
+          <ConfigScreen
+            navegarA={navegarA}
+            buscarInternet={buscarInternet}
+            setBuscarInternet={setBuscarInternet}
+            recetas={recetas}
+            borrarTodasLasRecetas={borrarTodasLasRecetas}
+          />
+        );
 
       case "CerrarSesion":
-        return <CerrarScreen navegarA={navegarA} />;
+        // Si ya cerró sesión, no hay nada que cerrar.
+        if (!sesionIniciada) {
+          return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+        }
+        return <CerrarScreen navegarA={navegarA} cerrarSesion={cerrarSesion} />;
 
       case "Resultados":
         // Le pasamos "route" (forma nueva) y también "busqueda" (forma vieja),
@@ -89,6 +149,7 @@ export default function App() {
           <ResultadosScreen
             navegarA={navegarA}
             route={parametrosNavegacion}
+            buscarInternet={buscarInternet}
             busqueda={
               parametrosNavegacion && parametrosNavegacion.busqueda
                 ? parametrosNavegacion.busqueda
@@ -142,7 +203,11 @@ export default function App() {
       case "Configuracion":
         return "Configuración";
       case "CerrarSesion":
-        return "Salir";
+        return "Cerrar Sesión";
+      case "Login":
+        return "Iniciar Sesión";
+      case "Registro":
+        return "Crear Cuenta";
       case "Resultados":
         return "Búsqueda";
       case "CrearReceta":
@@ -192,63 +257,65 @@ export default function App() {
               <Text style={styles.drawerTitulo}>Menú Principal</Text>
               <View style={styles.linea} />
 
+              {/* El menú solo tiene lo que NO está en la pantalla de Inicio.
+                  Categorías, Crear Receta y Mis Recetas ya tienen su caja
+                  ahí, y repetirlas acá sería mostrar lo mismo dos veces. */}
+
               {/* INICIO */}
               <TouchableOpacity
                 style={styles.drawerItem}
                 onPress={() => navegarA("Inicio")}
               >
-                <Text style={styles.drawerItemTexto}>🏠 Inicio</Text>
+                <Text style={styles.drawerItemTexto}>Inicio</Text>
               </TouchableOpacity>
 
-              {/* MI CUENTA */}
-              <TouchableOpacity
-                style={styles.drawerItem}
-                onPress={() => navegarA("Perfil")}
-              >
-                <Text style={styles.drawerItemTexto}>👤 Mi Cuenta</Text>
-              </TouchableOpacity>
+              {/* MI CUENTA: solo si hay sesión abierta */}
+              {sesionIniciada ? (
+                <TouchableOpacity
+                  style={styles.drawerItem}
+                  onPress={() => navegarA("Perfil")}
+                >
+                  <Text style={styles.drawerItemTexto}>Mi Cuenta</Text>
+                </TouchableOpacity>
+              ) : null}
 
-              {/* CATEGORÍAS */}
-              <TouchableOpacity
-                style={styles.drawerItem}
-                onPress={() => navegarA("Categorias")}
-              >
-                <Text style={styles.drawerItemTexto}>📂 Categorías</Text>
-              </TouchableOpacity>
-
-              {/* CREAR RECETA */}
-              <TouchableOpacity
-                style={styles.drawerItem}
-                onPress={() => navegarA("CrearReceta")}
-              >
-                <Text style={styles.drawerItemTexto}>📝 Crear Receta</Text>
-              </TouchableOpacity>
-
-              {/* MIS RECETAS */}
-              <TouchableOpacity
-                style={styles.drawerItem}
-                onPress={() => navegarA("MisRecetas")}
-              >
-                <Text style={styles.drawerItemTexto}>📖 Mis Recetas</Text>
-              </TouchableOpacity>
-
-              {/* CONFIGURACIÓN */}
+              {/* CONFIGURACIÓN: siempre visible */}
               <TouchableOpacity
                 style={styles.drawerItem}
                 onPress={() => navegarA("Configuracion")}
               >
-                <Text style={styles.drawerItemTexto}>⚙️ Configuración</Text>
+                <Text style={styles.drawerItemTexto}>Configuración</Text>
               </TouchableOpacity>
 
-              {/* CERRAR SESIÓN */}
-              <TouchableOpacity
-                style={styles.drawerItem}
-                onPress={() => navegarA("CerrarSesion")}
-              >
-                <Text style={[styles.drawerItemTexto, { color: "#d9534f" }]}>
-                  🚪 Cerrar Sesión
-                </Text>
-              </TouchableOpacity>
+              {/* Acá el menú cambia según haya sesión o no:
+                  con sesión abierta ofrece salir,
+                  sin sesión ofrece entrar o registrarse. */}
+              {sesionIniciada ? (
+                <TouchableOpacity
+                  style={styles.drawerItem}
+                  onPress={() => navegarA("CerrarSesion")}
+                >
+                  <Text style={[styles.drawerItemTexto, { color: "#A8322E" }]}>
+                    Cerrar Sesión
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View>
+                  <TouchableOpacity
+                    style={styles.drawerItem}
+                    onPress={() => navegarA("Login")}
+                  >
+                    <Text style={styles.drawerItemTexto}>Iniciar Sesión</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.drawerItem}
+                    onPress={() => navegarA("Registro")}
+                  >
+                    <Text style={styles.drawerItemTexto}>Registrarse</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
 
             {/* Zona oscura para cerrar el menú */}

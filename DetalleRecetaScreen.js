@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   portadaSinFoto: {
     height: 110,
-    backgroundColor: "#6b7a6e",
+    backgroundColor: "#7A5648",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   etiqueta: {
-    backgroundColor: "#E8EFF6",
+    backgroundColor: "#F7EBE5",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   etiquetaTexto: {
-    color: "#0566b6",
+    color: "#9C4221",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   punto: {
     fontSize: 15,
-    color: "#0566b6",
+    color: "#9C4221",
     marginRight: 8,
     fontWeight: "bold",
   },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "#0566b6",
+    backgroundColor: "#9C4221",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 10,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   botonVolver: {
-    backgroundColor: "#0566b6",
+    backgroundColor: "#9C4221",
     padding: 15,
     borderRadius: 12,
     alignItems: "center",

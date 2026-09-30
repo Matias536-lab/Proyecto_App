@@ -188,6 +188,177 @@ const DICCIONARIO_ES_EN = {
   vegano: "vegan",
 };
 
+
+// ------------------------------------------------------------
+// TRADUCCIONES PARA LAS RECETAS DE INTERNET
+//
+// La API manda el país y la categoría en inglés ("Malaysian", "Beef").
+// Acá los pasamos a español para poder redactar la descripción.
+// ------------------------------------------------------------
+const COCINAS_ES = {
+  American: "estadounidense",
+  British: "británica",
+  Canadian: "canadiense",
+  Chinese: "china",
+  Croatian: "croata",
+  Dutch: "neerlandesa",
+  Egyptian: "egipcia",
+  Filipino: "filipina",
+  French: "francesa",
+  Greek: "griega",
+  Indian: "india",
+  Irish: "irlandesa",
+  Italian: "italiana",
+  Jamaican: "jamaiquina",
+  Japanese: "japonesa",
+  Kenyan: "keniana",
+  Malaysian: "malaya",
+  Mexican: "mexicana",
+  Moroccan: "marroquí",
+  Polish: "polaca",
+  Portuguese: "portuguesa",
+  Russian: "rusa",
+  Spanish: "española",
+  Thai: "tailandesa",
+  Tunisian: "tunecina",
+  Turkish: "turca",
+  Ukrainian: "ucraniana",
+  Uruguayan: "uruguaya",
+  Vietnamese: "vietnamita",
+};
+
+const CATEGORIAS_API_ES = {
+  Beef: "carnes",
+  Breakfast: "desayunos",
+  Chicken: "pollo",
+  Dessert: "postres",
+  Goat: "cabrito",
+  Lamb: "cordero",
+  Miscellaneous: "varios",
+  Pasta: "pastas",
+  Pork: "cerdo",
+  Seafood: "pescados y mariscos",
+  Side: "guarniciones",
+  Starter: "entradas",
+  Vegan: "cocina vegana",
+  Vegetarian: "cocina vegetariana",
+};
+
+// Ingredientes más comunes, para poder nombrar los principales en español.
+// Si un ingrediente no está en esta lista, simplemente no lo mencionamos:
+// preferimos decir menos antes que mezclar los dos idiomas.
+const INGREDIENTES_EN_ES = {
+  beef: "carne vacuna", chicken: "pollo", pork: "cerdo", lamb: "cordero",
+  bacon: "panceta", sausage: "salchicha", ham: "jamón", turkey: "pavo",
+  fish: "pescado", salmon: "salmón", tuna: "atún", prawns: "langostinos",
+  shrimp: "camarones", "minced beef": "carne picada",
+  onion: "cebolla", onions: "cebolla", garlic: "ajo", tomato: "tomate",
+  tomatoes: "tomate", potato: "papa", potatoes: "papas", carrot: "zanahoria",
+  carrots: "zanahoria", pepper: "morrón", mushrooms: "hongos",
+  spinach: "espinaca", lettuce: "lechuga", broccoli: "brócoli",
+  celery: "apio", cucumber: "pepino", peas: "arvejas", corn: "choclo",
+  cabbage: "repollo", zucchini: "zapallito", pumpkin: "zapallo",
+  rice: "arroz", pasta: "pasta", noodles: "fideos", flour: "harina",
+  bread: "pan", oats: "avena", sugar: "azúcar", salt: "sal",
+  butter: "manteca", milk: "leche", cream: "crema", cheese: "queso",
+  eggs: "huevos", egg: "huevo", yoghurt: "yogur", oil: "aceite",
+  "olive oil": "aceite de oliva", "vegetable oil": "aceite",
+  lemon: "limón", lime: "lima", orange: "naranja", apple: "manzana",
+  banana: "banana", strawberries: "frutillas", coconut: "coco",
+  chocolate: "chocolate", honey: "miel", vanilla: "vainilla",
+  cinnamon: "canela", ginger: "jengibre", parsley: "perejil",
+  basil: "albahaca", oregano: "orégano", rosemary: "romero",
+  thyme: "tomillo", curry: "curry", paprika: "pimentón",
+  "soy sauce": "salsa de soja", "coconut milk": "leche de coco",
+  water: "agua", wine: "vino", beans: "porotos", lentils: "lentejas",
+  chickpeas: "garbanzos",
+};
+
+// Busca el ingrediente en la lista. Prueba el nombre entero y,
+// si no aparece, cada palabra por separado ("Vegetable Oil" -> "aceite").
+function traducirIngrediente(nombre) {
+  const limpio = normalizar(nombre);
+  if (!limpio) return null;
+
+  if (INGREDIENTES_EN_ES[limpio]) return INGREDIENTES_EN_ES[limpio];
+
+  const palabras = limpio.split(" ");
+  for (let i = 0; i < palabras.length; i++) {
+    if (INGREDIENTES_EN_ES[palabras[i]]) return INGREDIENTES_EN_ES[palabras[i]];
+  }
+  return null;
+}
+
+// Une una lista en una frase: "a, b y c"
+function unirConY(lista) {
+  if (lista.length === 1) return lista[0];
+  return lista.slice(0, -1).join(", ") + " y " + lista[lista.length - 1];
+}
+
+// ------------------------------------------------------------
+// ARMA LA DESCRIPCIÓN DE UNA RECETA DE INTERNET
+//
+// La API no manda ningún resumen del plato, así que lo redactamos
+// nosotros con los datos que sí manda: país, categoría, ingredientes
+// y cantidad de pasos. Todo lo que dice es información real de la API:
+// no inventamos historia ni origen del plato.
+// ------------------------------------------------------------
+function armarDescripcion(plato, nombresIngredientes, cantidadPasos) {
+  const frases = [];
+
+  // 1) De dónde es y de qué tipo es
+  const cocina = COCINAS_ES[plato.strArea];
+  const categoria = CATEGORIAS_API_ES[plato.strCategory];
+
+  if (cocina && categoria) {
+    frases.push(
+      "Plato de la cocina " + cocina + ", dentro de la categoría " + categoria + "."
+    );
+  } else if (cocina) {
+    frases.push("Plato de la cocina " + cocina + ".");
+  } else if (categoria) {
+    frases.push("Plato de la categoría " + categoria + ".");
+  } else {
+    frases.push("Receta de cocina internacional.");
+  }
+
+  // 2) Con qué se prepara: nombramos hasta 3 ingredientes reconocibles
+  const principales = [];
+  for (let i = 0; i < nombresIngredientes.length && principales.length < 3; i++) {
+    const traducido = traducirIngrediente(nombresIngredientes[i]);
+    if (traducido && principales.indexOf(traducido) === -1) {
+      principales.push(traducido);
+    }
+  }
+
+  const total = nombresIngredientes.length;
+
+  if (principales.length >= 2) {
+    frases.push(
+      "Se prepara con " + unirConY(principales) +
+      ", entre " + total + " ingredientes en total."
+    );
+  } else if (total > 0) {
+    frases.push(
+      "Lleva " + total + (total === 1 ? " ingrediente." : " ingredientes.")
+    );
+  }
+
+  // 3) Qué tan larga es la preparación
+  if (cantidadPasos === 1) {
+    frases.push("Su elaboración es de un solo paso.");
+  } else if (cantidadPasos > 1) {
+    frases.push("Su elaboración se divide en " + cantidadPasos + " pasos.");
+  }
+
+  // 4) Aviso de idioma
+  frases.push(
+    "El texto original de la receta está en inglés, tal como lo publica TheMealDB."
+  );
+
+  return frases.join(" ");
+}
+
 // Traduce lo que escribió el usuario, palabra por palabra.
 function traducirBusqueda(texto) {
   const limpio = normalizar(texto);
@@ -281,17 +452,17 @@ function convertirTheMealDB(plato) {
   // TheMealDB manda los ingredientes en 20 campos sueltos:
   // strIngredient1, strIngredient2... con su medida en strMeasure1, etc.
   const ingredientes = [];
+  const nombresIngredientes = [];
+
   for (let i = 1; i <= 20; i++) {
     const nombre = plato["strIngredient" + i];
     const medida = plato["strMeasure" + i];
 
     if (nombre && String(nombre).trim() !== "") {
-      const linea = (
-        String(medida || "").trim() +
-        " " +
-        String(nombre).trim()
-      ).trim();
+      const linea = (String(medida || "").trim() + " " + String(nombre).trim()).trim();
       ingredientes.push(linea);
+      // Guardamos aparte el nombre sin la cantidad, para la descripción
+      nombresIngredientes.push(String(nombre).trim());
     }
   }
 
@@ -308,14 +479,10 @@ function convertirTheMealDB(plato) {
   return {
     id: "api-" + plato.idMeal,
     nombre: plato.strMeal,
-    categoria: plato.strCategory || "De internet",
-    emoji: "🌐",
+    categoria: CATEGORIAS_API_ES[plato.strCategory] || "De internet",
     tiempo: "",
     porciones: "",
-    descripcion:
-      "Receta obtenida de TheMealDB. Cocina de origen: " +
-      (plato.strArea || "internacional") +
-      ". El texto original está en inglés.",
+    descripcion: armarDescripcion(plato, nombresIngredientes, pasos.length),
     ingredientes: ingredientes,
     pasos: pasos,
     imagen: plato.strMealThumb || null,
@@ -328,19 +495,17 @@ function convertirTheMealDB(plato) {
 async function buscarEnSpoonacular(consulta) {
   if (!SPOONACULAR_API_KEY || SPOONACULAR_API_KEY === "PEGA_TU_API_KEY_ACA") {
     throw new Error(
-      "Falta cargar la API key de Spoonacular en el archivo api.js.",
+      "Falta cargar la API key de Spoonacular en el archivo api.js."
     );
   }
 
   const url =
     "https://api.spoonacular.com/recipes/complexSearch" +
-    "?query=" +
-    encodeURIComponent(consulta) +
+    "?query=" + encodeURIComponent(consulta) +
     "&number=8" +
     "&addRecipeInformation=true" +
     "&fillIngredients=true" +
-    "&apiKey=" +
-    SPOONACULAR_API_KEY;
+    "&apiKey=" + SPOONACULAR_API_KEY;
 
   const respuesta = await fetch(url);
 
@@ -350,7 +515,7 @@ async function buscarEnSpoonacular(consulta) {
   }
   if (respuesta.status === 402) {
     throw new Error(
-      "Se agotaron los créditos diarios de Spoonacular. Probá de nuevo mañana.",
+      "Se agotaron los créditos diarios de Spoonacular. Probá de nuevo mañana."
     );
   }
   if (!respuesta.ok) {
@@ -411,7 +576,6 @@ function convertirSpoonacular(plato) {
     id: "api-" + plato.id,
     nombre: plato.title,
     categoria: "De internet",
-    emoji: "🌐",
     tiempo: plato.readyInMinutes ? plato.readyInMinutes + " minutos" : "",
     porciones: plato.servings ? plato.servings + " porciones" : "",
     descripcion: resumen
