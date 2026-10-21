@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,196 +6,233 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
-} from "react-native";
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
 
-// Pantalla de registro.
-//
-// Al igual que el inicio de sesión, es una simulación: no hay servidor
-// donde guardar la cuenta. Validamos los datos y abrimos la sesión
-// directamente con el nombre que escribió el usuario.
+import { registrarUsuario } from './apiUsuarios';
+
 export default function RegistroScreen({ navegarA, iniciarSesion }) {
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
-  const [contrasena, setContrasena] = useState("");
-  const [repetir, setRepetir] = useState("");
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [repetir, setRepetir] = useState('');
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState('');
 
-  const registrarse = () => {
-    if (!nombre.trim()) {
-      Alert.alert("Falta un dato", "Ingresá tu nombre.");
+  const crearCuenta = async () => {
+    setError('');
+
+    if (!nombre.trim() || !email.trim() || !contrasena) {
+      setError('Completa todos los campos.');
       return;
     }
-
-    if (!email.trim()) {
-      Alert.alert("Falta un dato", "Ingresá tu correo electrónico.");
+    if (contrasena.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
-
-    if (email.indexOf("@") === -1 || email.indexOf(".") === -1) {
-      Alert.alert("Correo inválido", "Escribí un correo válido, por ejemplo nombre@mail.com");
-      return;
-    }
-
-    if (contrasena.length < 4) {
-      Alert.alert("Contraseña corta", "La contraseña debe tener al menos 4 caracteres.");
-      return;
-    }
-
-    // Esta validación es la que más se olvida y la que más molesta al usuario
     if (contrasena !== repetir) {
-      Alert.alert("No coinciden", "Las dos contraseñas tienen que ser iguales.");
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
-    iniciarSesion({
-      nombre: nombre.trim(),
-      email: email.trim(),
-    });
+    setCargando(true);
+
+    try {
+      // Si el correo ya existe, la API lo rechaza. Esa validacion la hace la
+      // base de datos, asi que no se puede saltear desde la app.
+      const usuario = await registrarUsuario(nombre.trim(), email.trim(), contrasena);
+
+      if (iniciarSesion) {
+        iniciarSesion(usuario);
+      }
+
+      navegarA('Inicio');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.form}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView style={styles.contenedor} keyboardShouldPersistTaps="handled">
         <Text style={styles.titulo}>Crear cuenta</Text>
-        <Text style={styles.bajada}>
-          Registrate para tener tu espacio de recetas en MyKitchen.
+        <Text style={styles.subtitulo}>
+          Tus datos se guardan en la base de datos de MyKitchen.
         </Text>
 
-        <Text style={styles.label}>Nombre</Text>
+        <Text style={styles.etiqueta}>Nombre</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Ej: Matías"
+          style={styles.campo}
           value={nombre}
           onChangeText={setNombre}
-          placeholderTextColor="#999"
+          placeholder="Tu nombre"
+          placeholderTextColor="#AAA"
+          editable={!cargando}
         />
 
-        <Text style={styles.label}>Correo electrónico</Text>
+        <Text style={styles.etiqueta}>Correo electrónico</Text>
         <TextInput
-          style={styles.input}
-          placeholder="nombre@mail.com"
+          style={styles.campo}
           value={email}
           onChangeText={setEmail}
-          placeholderTextColor="#999"
+          placeholder="tucorreo@ejemplo.com"
+          placeholderTextColor="#AAA"
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
+          editable={!cargando}
         />
 
-        <Text style={styles.label}>Contraseña</Text>
+        <Text style={styles.etiqueta}>Contraseña</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Al menos 4 caracteres"
+          style={styles.campo}
           value={contrasena}
           onChangeText={setContrasena}
-          placeholderTextColor="#999"
+          placeholder="Al menos 6 caracteres"
+          placeholderTextColor="#AAA"
           secureTextEntry
+          editable={!cargando}
         />
 
-        <Text style={styles.label}>Repetir contraseña</Text>
+        <Text style={styles.etiqueta}>Repetir contraseña</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Escribila de nuevo"
+          style={styles.campo}
           value={repetir}
           onChangeText={setRepetir}
-          placeholderTextColor="#999"
+          placeholder="Escribila de nuevo"
+          placeholderTextColor="#AAA"
           secureTextEntry
+          editable={!cargando}
         />
 
-        <TouchableOpacity style={styles.botonPrincipal} onPress={registrarse}>
-          <Text style={styles.botonPrincipalTexto}>Crear cuenta</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.boton, cargando && styles.botonApagado]}
+          onPress={crearCuenta}
+          disabled={cargando}
+        >
+          {cargando ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.textoBoton}>Registrarme</Text>
+          )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navegarA("Login")}>
-          <Text style={styles.enlace}>¿Ya tenés cuenta? Iniciá sesión</Text>
+        <View style={styles.separador} />
+
+        <Text style={styles.textoPie}>¿Ya tenés cuenta?</Text>
+
+        <TouchableOpacity
+          style={styles.botonSecundario}
+          onPress={() => navegarA('Login')}
+          disabled={cargando}
+        >
+          <Text style={styles.textoBotonSecundario}>Iniciar sesión</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navegarA("Inicio")}>
-          <Text style={styles.enlaceSecundario}>Seguir sin registrarme</Text>
+        <TouchableOpacity onPress={() => navegarA('Inicio')} disabled={cargando}>
+          <Text style={styles.volver}>Volver al inicio</Text>
         </TouchableOpacity>
 
-        <View style={styles.aviso}>
-          <Text style={styles.avisoTexto}>
-            Esta versión no se conecta a ningún servidor: la cuenta queda
-            guardada solo mientras la aplicación esté abierta.
-          </Text>
-        </View>
-      </View>
-    </ScrollView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  contenedor: {
     flex: 1,
-    backgroundColor: "#F5F4EE",
-  },
-  form: {
-    padding: 20,
+    backgroundColor: '#F5F4EE',
+    padding: 24
   },
   titulo: {
     fontSize: 26,
-    fontWeight: "bold",
-    color: "#333",
-    marginTop: 10,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 10
   },
-  bajada: {
+  subtitulo: {
     fontSize: 15,
-    color: "#666",
-    marginTop: 5,
-    marginBottom: 10,
+    color: '#777',
+    marginTop: 6,
+    marginBottom: 26,
+    lineHeight: 21
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 5,
-    marginTop: 18,
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#E6E4DC",
-    fontSize: 16,
-    color: "#333",
-  },
-  botonPrincipal: {
-    backgroundColor: "#9C4221",
-    padding: 15,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 30,
-  },
-  botonPrincipalTexto: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  enlace: {
-    color: "#9C4221",
-    fontSize: 15,
-    textAlign: "center",
-    marginTop: 20,
-    fontWeight: "600",
-  },
-  enlaceSecundario: {
-    color: "#777",
+  etiqueta: {
     fontSize: 14,
-    textAlign: "center",
-    marginTop: 15,
-    textDecorationLine: "underline",
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 6
   },
-  aviso: {
-    backgroundColor: "#EFEDE4",
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 30,
-    marginBottom: 20,
+  campo: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E6E4DC',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 18
   },
-  avisoTexto: {
-    fontSize: 13,
-    color: "#777",
-    lineHeight: 18,
+  error: {
+    color: '#A8322E',
+    fontSize: 14,
+    marginBottom: 14,
+    lineHeight: 19
   },
+  boton: {
+    backgroundColor: '#9C4221',
+    borderRadius: 12,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 4
+  },
+  botonApagado: {
+    opacity: 0.7
+  },
+  textoBoton: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  separador: {
+    height: 1,
+    backgroundColor: '#E6E4DC',
+    marginVertical: 28
+  },
+  textoPie: {
+    fontSize: 15,
+    color: '#777',
+    textAlign: 'center',
+    marginBottom: 12
+  },
+  botonSecundario: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#9C4221',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center'
+  },
+  textoBotonSecundario: {
+    color: '#9C4221',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  volver: {
+    color: '#888',
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: 22
+  }
 });

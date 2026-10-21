@@ -1,12 +1,24 @@
 const express = require('express');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const pool = require('./db');
 const config = require('./config');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+
+// Conexion a MySQL. Se usa un pool en vez de una conexion sola porque
+// varios celulares pueden pedir cosas al mismo tiempo.
+const pool = mysql.createPool({
+  host: config.db.host,
+  port: config.db.port,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database,
+  waitForConnections: true,
+  connectionLimit: 10
+});
 
 
 app.get('/ping', async (req, res) => {
@@ -35,11 +47,9 @@ app.post('/registro', async (req, res) => {
   }
 
   try {
-    const hash = await bcrypt.hash(contrasena, 10);
-
     const [resultado] = await pool.query(
       'INSERT INTO usuarios (nombre, email, contrasena_hash) VALUES (?, ?, ?)',
-      [nombre, email, hash]
+      [nombre, email, contrasena]
     );
 
     res.status(201).json({ id: resultado.insertId, nombre: nombre, email: email });
@@ -76,8 +86,7 @@ app.post('/login', async (req, res) => {
       return res.status(403).json({ error: 'La cuenta esta desactivada' });
     }
 
-    const coincide = await bcrypt.compare(contrasena, usuario.contrasena_hash);
-    if (!coincide) {
+    if (contrasena !== usuario.contrasena_hash) {
       return res.status(401).json({ error: 'Correo o contrasena incorrectos' });
     }
 
@@ -127,6 +136,18 @@ app.get('/usuarios/:id', async (req, res) => {
 });
 
 
+// Prueba la conexion al arrancar, para saber enseguida si MySQL esta apagado
+// y no enterarse recien en el primer pedido.
+pool.getConnection()
+  .then((conexion) => {
+    console.log('Conectado a mysql');
+    conexion.release();
+  })
+  .catch((e) => {
+    console.error('Error conectando a la base de datos: ' + e.message);
+  });
+
+
 app.listen(config.puerto, '0.0.0.0', () => {
-  console.log('API de MyKitchen escuchando en el puerto ' + config.puerto);
+  console.log('Server corriendo en puerto ' + config.puerto);
 });

@@ -6,111 +6,125 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
-// Pantalla de inicio de sesión.
-//
-// IMPORTANTE: es una simulación. No hay servidor ni base de datos detrás,
-// así que la app no puede comprobar si la contraseña es correcta.
-// Lo único que hacemos es validar que los campos estén bien escritos
-// y darle al usuario una sesión abierta con esos datos.
+import { loguearUsuario } from "./apiUsuarios";
+
 export default function LoginScreen({ navegarA, iniciarSesion }) {
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
 
-  const entrar = () => {
-    // Validación 1: que no esté vacío
-    if (!email.trim()) {
-      Alert.alert("Falta un dato", "Ingresá tu correo electrónico.");
+  const entrar = async () => {
+    setError("");
+
+    if (!email.trim() || !contrasena) {
+      setError("Completa el correo y la contraseña.");
       return;
     }
 
-    // Validación 2: que parezca un correo (tenga arroba y un punto después)
-    if (email.indexOf("@") === -1 || email.indexOf(".") === -1) {
-      Alert.alert("Correo inválido", "Escribí un correo válido, por ejemplo nombre@mail.com");
-      return;
+    setCargando(true);
+
+    try {
+      // La API busca el correo en la base. Si no existe, o la contraseña no
+      // coincide, devuelve un error y no se pasa de aca.
+      const usuario = await loguearUsuario(email.trim(), contrasena);
+
+      if (iniciarSesion) {
+        iniciarSesion(usuario);
+      }
+
+      navegarA("Inicio");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setCargando(false);
     }
-
-    // Validación 3: contraseña mínima
-    if (contrasena.length < 4) {
-      Alert.alert("Contraseña corta", "La contraseña debe tener al menos 4 caracteres.");
-      return;
-    }
-
-    // Todo bien: abrimos la sesión.
-    // Como no hay servidor, armamos el nombre a partir del correo:
-    // de "matias@mail.com" sacamos "matias".
-    const nombreDelCorreo = email.split("@")[0];
-
-    iniciarSesion({
-      nombre: nombreDelCorreo,
-      email: email.trim(),
-    });
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.form}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView style={styles.contenedor} keyboardShouldPersistTaps="handled">
         <Text style={styles.titulo}>Iniciar sesión</Text>
-        <Text style={styles.bajada}>
-          Entrá a tu cuenta para guardar y crear tus recetas.
+        <Text style={styles.subtitulo}>
+          Entra con la cuenta que registraste en MyKitchen.
         </Text>
 
-        <Text style={styles.label}>Correo electrónico</Text>
+        <Text style={styles.etiqueta}>Correo electrónico</Text>
         <TextInput
-          style={styles.input}
-          placeholder="nombre@mail.com"
+          style={styles.campo}
           value={email}
           onChangeText={setEmail}
-          placeholderTextColor="#999"
+          placeholder="tucorreo@ejemplo.com"
+          placeholderTextColor="#AAA"
           keyboardType="email-address"
           autoCapitalize="none"
+          autoCorrect={false}
+          editable={!cargando}
         />
 
-        <Text style={styles.label}>Contraseña</Text>
+        <Text style={styles.etiqueta}>Contraseña</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Tu contraseña"
+          style={styles.campo}
           value={contrasena}
           onChangeText={setContrasena}
-          placeholderTextColor="#999"
+          placeholder="Tu contraseña"
+          placeholderTextColor="#AAA"
           secureTextEntry
+          editable={!cargando}
         />
 
-        <TouchableOpacity style={styles.botonPrincipal} onPress={entrar}>
-          <Text style={styles.botonPrincipalTexto}>Entrar</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.boton, cargando && styles.botonApagado]}
+          onPress={entrar}
+          disabled={cargando}
+        >
+          {cargando ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.textoBoton}>Entrar</Text>
+          )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navegarA("Registro")}>
-          <Text style={styles.enlace}>
-            ¿No tenés cuenta? Registrate acá
-          </Text>
+        <View style={styles.separador} />
+
+        <Text style={styles.textoPie}>¿Todavía no tenés cuenta?</Text>
+
+        <TouchableOpacity
+          style={styles.botonSecundario}
+          onPress={() => navegarA("Registro")}
+          disabled={cargando}
+        >
+          <Text style={styles.textoBotonSecundario}>Crear una cuenta</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navegarA("Inicio")}>
-          <Text style={styles.enlaceSecundario}>Seguir sin iniciar sesión</Text>
+        <TouchableOpacity
+          onPress={() => navegarA("Inicio")}
+          disabled={cargando}
+        >
+          <Text style={styles.volver}>Volver al inicio</Text>
         </TouchableOpacity>
 
-        {/* Aviso honesto sobre el alcance de esta pantalla */}
-        <View style={styles.aviso}>
-          <Text style={styles.avisoTexto}>
-            Esta versión no se conecta a ningún servidor: los datos de la cuenta
-            quedan guardados solo mientras la aplicación esté abierta.
-          </Text>
-        </View>
-      </View>
-    </ScrollView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  contenedor: {
     flex: 1,
     backgroundColor: "#F5F4EE",
-  },
-  form: {
-    padding: 20,
+    padding: 24,
   },
   titulo: {
     fontSize: 26,
@@ -118,64 +132,79 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: 10,
   },
-  bajada: {
+  subtitulo: {
     fontSize: 15,
-    color: "#666",
-    marginTop: 5,
-    marginBottom: 10,
+    color: "#777",
+    marginTop: 6,
+    marginBottom: 26,
+    lineHeight: 21,
   },
-  label: {
-    fontSize: 16,
+  etiqueta: {
+    fontSize: 14,
     fontWeight: "600",
-    color: "#333",
-    marginBottom: 5,
-    marginTop: 18,
+    color: "#555",
+    marginBottom: 6,
   },
-  input: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
+  campo: {
+    backgroundColor: "#FFF",
     borderWidth: 1,
     borderColor: "#E6E4DC",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
     fontSize: 16,
     color: "#333",
+    marginBottom: 18,
   },
-  botonPrincipal: {
+  error: {
+    color: "#A8322E",
+    fontSize: 14,
+    marginBottom: 14,
+    lineHeight: 19,
+  },
+  boton: {
     backgroundColor: "#9C4221",
-    padding: 15,
     borderRadius: 12,
+    paddingVertical: 15,
     alignItems: "center",
-    marginTop: 30,
+    marginTop: 4,
   },
-  botonPrincipalTexto: {
-    color: "#fff",
+  botonApagado: {
+    opacity: 0.7,
+  },
+  textoBoton: {
+    color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
   },
-  enlace: {
+  separador: {
+    height: 1,
+    backgroundColor: "#E6E4DC",
+    marginVertical: 28,
+  },
+  textoPie: {
+    fontSize: 15,
+    color: "#777",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  botonSecundario: {
+    backgroundColor: "#FFF",
+    borderWidth: 1,
+    borderColor: "#9C4221",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  textoBotonSecundario: {
     color: "#9C4221",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  volver: {
+    color: "#888",
     fontSize: 15,
     textAlign: "center",
-    marginTop: 20,
-    fontWeight: "600",
-  },
-  enlaceSecundario: {
-    color: "#777",
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 15,
-    textDecorationLine: "underline",
-  },
-  aviso: {
-    backgroundColor: "#EFEDE4",
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 30,
-    marginBottom: 20,
-  },
-  avisoTexto: {
-    fontSize: 13,
-    color: "#777",
-    lineHeight: 18,
+    marginTop: 22,
   },
 });
