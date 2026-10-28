@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,7 +6,16 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+
+import {
+  asegurarRecetaEnBase,
+  consultarFavorito,
+  marcarFavorito,
+  quitarFavorito,
+} from "./apiUsuarios";
 
 // Esta pantalla muestra la ficha completa de UNA receta.
 //
@@ -15,7 +24,7 @@ import {
 //
 // Sirve tanto para las recetas propias de MyKitchen (recetas.js)
 // como para las que vengan de la API, porque las dos usan los mismos campos.
-export default function DetalleRecetaScreen({ navegarA, route }) {
+export default function DetalleRecetaScreen({ navegarA, route, usuario }) {
   // Si la foto del plato no llega a cargarse (sin internet, dirección
   // caída), lo anotamos acá para mostrar una portada de respaldo
   // en vez de dejar un hueco roto en la pantalla.
@@ -24,6 +33,74 @@ export default function DetalleRecetaScreen({ navegarA, route }) {
   // Si por algún motivo llegamos acá sin receta, mostramos un aviso
   // en lugar de dejar que la app se rompa.
   const receta = route && route.receta ? route.receta : null;
+
+  // ---- FAVORITOS ----
+  // Solo se puede marcar con sesión abierta: la tabla favoritos une un
+  // usuario con una receta, así que sin usuario no hay nada que guardar.
+  const usuarioId = usuario && usuario.id ? usuario.id : null;
+
+  const [esFavorito, setEsFavorito] = useState(false);
+  const [idEnBase, setIdEnBase] = useState(null);
+  const [trabajando, setTrabajando] = useState(false);
+
+  // Si la receta ya vive en MySQL, preguntamos si está entre los favoritos.
+  // Si viene de recetas.js o de la API, todavía no existe en la base, así
+  // que no hay nada que preguntar: se importa recién al tocar el botón.
+  useEffect(() => {
+    if (!receta || !usuarioId || receta.origen !== "bdd") {
+      setEsFavorito(false);
+      setIdEnBase(receta && receta.origen === "bdd" ? receta.id : null);
+      return;
+    }
+
+    let cancelado = false;
+    setIdEnBase(receta.id);
+
+    consultarFavorito(usuarioId, receta.id)
+      .then((r) => {
+        if (!cancelado) setEsFavorito(r.favorito);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelado = true;
+    };
+  }, [receta && receta.id, usuarioId]);
+
+  const cambiarFavorito = async () => {
+    if (!usuarioId) {
+      Alert.alert(
+        "Necesitás una cuenta",
+        "Los favoritos se guardan en tu cuenta, así que hace falta iniciar sesión.",
+        [
+          { text: "Ahora no", style: "cancel" },
+          { text: "Iniciar sesión", onPress: () => navegarA("Login") },
+        ]
+      );
+      return;
+    }
+
+    setTrabajando(true);
+
+    try {
+      // La primera vez que alguien guarda una receta de internet o de las
+      // nuestras, se copia a MySQL. A partir de ahí ya existe para todos.
+      const id = idEnBase || (await asegurarRecetaEnBase(receta, usuarioId));
+      setIdEnBase(id);
+
+      if (esFavorito) {
+        await quitarFavorito(usuarioId, id);
+        setEsFavorito(false);
+      } else {
+        await marcarFavorito(usuarioId, id);
+        setEsFavorito(true);
+      }
+    } catch (e) {
+      Alert.alert("No se pudo guardar", e.message);
+    } finally {
+      setTrabajando(false);
+    }
+  };
 
   if (!receta) {
     return (
@@ -87,6 +164,26 @@ export default function DetalleRecetaScreen({ navegarA, route }) {
           </View>
         ) : null}
       </View>
+
+      {/* FAVORITOS */}
+      <TouchableOpacity
+        style={[styles.botonFavorito, esFavorito && styles.botonFavoritoActivo]}
+        onPress={cambiarFavorito}
+        disabled={trabajando}
+      >
+        {trabajando ? (
+          <ActivityIndicator size="small" color={esFavorito ? "#FFFFFF" : "#9C4221"} />
+        ) : (
+          <Text
+            style={[
+              styles.botonFavoritoTexto,
+              esFavorito && styles.botonFavoritoTextoActivo,
+            ]}
+          >
+            {esFavorito ? "Guardada en favoritos" : "Guardar en favoritos"}
+          </Text>
+        )}
+      </TouchableOpacity>
 
       {/* INFORMACIÓN BREVE SOBRE EL PLATO */}
       {receta.descripcion ? (
@@ -286,5 +383,26 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: 25,
+  },
+  botonFavorito: {
+    borderWidth: 1,
+    borderColor: "#9C4221",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 13,
+    alignItems: "center",
+    marginTop: 4,
+    marginBottom: 18,
+  },
+  botonFavoritoActivo: {
+    backgroundColor: "#9C4221",
+  },
+  botonFavoritoTexto: {
+    color: "#9C4221",
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  botonFavoritoTextoActivo: {
+    color: "#FFFFFF",
   },
 });

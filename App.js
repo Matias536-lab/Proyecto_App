@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -21,6 +21,12 @@ import DetalleRecetaScreen from "./DetalleRecetaScreen";
 import LoginScreen from "./LoginScreen";
 import RegistroScreen from "./RegistroScreen";
 
+import {
+  PREFERENCIAS_INICIALES,
+  cargarPreferencias,
+  guardarPreferencias,
+} from "./preferencias";
+
 export default function App() {
   // Controla si el menú lateral está abierto o cerrado
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -33,8 +39,33 @@ export default function App() {
 
   // ---- PREFERENCIAS DE LA APP ----
   // Viven acá y no dentro de ConfigScreen, para que no se pierdan
-  // cuando el usuario sale de esa pantalla y vuelve.
-  const [buscarInternet, setBuscarInternet] = useState(true);
+  // cuando el usuario sale de esa pantalla y vuelve. Además se guardan
+  // en el teléfono, así que tampoco se pierden al cerrar la app.
+  const [preferencias, setPreferencias] = useState(PREFERENCIAS_INICIALES);
+
+  // Al abrir la app, leemos lo que el usuario había dejado guardado.
+  useEffect(() => {
+    let cancelado = false;
+    cargarPreferencias().then((guardadas) => {
+      if (!cancelado) setPreferencias(guardadas);
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Cambia una preferencia y la guarda en el teléfono en el mismo paso,
+  // para que no haya forma de cambiar una sin que quede guardada.
+  const cambiarPreferencia = (clave, valor) => {
+    const nuevas = Object.assign({}, preferencias, { [clave]: valor });
+    setPreferencias(nuevas);
+    guardarPreferencias(nuevas);
+  };
+
+  const restablecerPreferencias = () => {
+    setPreferencias(PREFERENCIAS_INICIALES);
+    guardarPreferencias(PREFERENCIAS_INICIALES);
+  };
 
   // ---- SESIÓN DEL USUARIO ----
   // sesionIniciada dice si hay alguien "adentro" de la app.
@@ -128,10 +159,9 @@ export default function App() {
         return (
           <ConfigScreen
             navegarA={navegarA}
-            buscarInternet={buscarInternet}
-            setBuscarInternet={setBuscarInternet}
-            recetas={recetas}
-            borrarTodasLasRecetas={borrarTodasLasRecetas}
+            preferencias={preferencias}
+            cambiarPreferencia={cambiarPreferencia}
+            restablecerPreferencias={restablecerPreferencias}
           />
         );
 
@@ -149,7 +179,7 @@ export default function App() {
           <ResultadosScreen
             navegarA={navegarA}
             route={parametrosNavegacion}
-            buscarInternet={buscarInternet}
+            buscarInternet={preferencias.buscarInternet}
             busqueda={
               parametrosNavegacion && parametrosNavegacion.busqueda
                 ? parametrosNavegacion.busqueda
@@ -162,7 +192,7 @@ export default function App() {
         return (
           <CrearRecetasScreen
             navegarA={navegarA}
-            agregarReceta={agregarReceta}
+            usuario={usuario}
           />
         );
 
@@ -170,8 +200,7 @@ export default function App() {
         return (
           <MisRecetasScreen
             navegarA={navegarA}
-            recetas={recetas}
-            eliminarReceta={eliminarReceta}
+            usuario={usuario}
           />
         );
 
@@ -185,6 +214,7 @@ export default function App() {
           <DetalleRecetaScreen
             navegarA={navegarA}
             route={parametrosNavegacion}
+            usuario={usuario}
           />
         );
 

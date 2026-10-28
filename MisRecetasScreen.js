@@ -1,268 +1,337 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  ScrollView, 
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
   TouchableOpacity,
-  Alert,
-  Modal,
-  FlatList
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 
-export default function MisRecetasScreen({ navegarA, recetas, eliminarReceta }) {
-  const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+import {
+  traerRecetasDeUsuario,
+  traerRecetaCompleta,
+  borrarReceta
+} from './apiUsuarios';
 
-  const verDetalle = (receta) => {
-    setRecetaSeleccionada(receta);
-    setModalVisible(true);
+// Las recetas que creó el usuario. Salen de MySQL, no de la memoria de la app.
+
+const ACENTO = '#9C4221';
+const FONDO = '#F5F4EE';
+const TARJETA = '#FFFFFF';
+const BORDE = '#E6E4DC';
+const TEXTO = '#333333';
+const TEXTO_SUAVE = '#888888';
+const DESTRUCTIVO = '#A8322E';
+const RESPALDO_FOTO = '#7A5848';
+
+function Tarjeta({ receta, onAbrir, onBorrar }) {
+  const [fotoFallo, setFotoFallo] = useState(false);
+
+  return (
+    <View style={styles.tarjeta}>
+      <TouchableOpacity style={styles.tarjetaCuerpo} onPress={onAbrir} activeOpacity={0.8}>
+        {receta.imagen && !fotoFallo ? (
+          <Image
+            source={{ uri: receta.imagen }}
+            style={styles.miniatura}
+            onError={() => setFotoFallo(true)}
+          />
+        ) : (
+          <View style={[styles.miniatura, styles.miniaturaSinFoto]}>
+            <Text style={styles.miniaturaTexto}>{receta.categoria}</Text>
+          </View>
+        )}
+
+        <View style={styles.tarjetaTextos}>
+          <Text style={styles.tarjetaNombre} numberOfLines={2}>
+            {receta.nombre}
+          </Text>
+          <Text style={styles.tarjetaCategoria}>{receta.categoria}</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.botonBorrar} onPress={onBorrar}>
+        <Text style={styles.botonBorrarTexto}>Borrar</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+export default function MisRecetasScreen({ navegarA, usuario }) {
+  const [recetas, setRecetas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+  const [ocupado, setOcupado] = useState(false);
+
+  const id = usuario && usuario.id ? usuario.id : null;
+
+  const cargar = () => {
+    if (!id) {
+      setCargando(false);
+      return;
+    }
+    setCargando(true);
+    setError('');
+
+    traerRecetasDeUsuario(id)
+      .then(setRecetas)
+      .catch((e) => setError(e.message))
+      .then(() => setCargando(false));
   };
 
-  const confirmarEliminar = (id) => {
+  useEffect(cargar, [id]);
+
+  const abrir = async (receta) => {
+    setOcupado(true);
+    try {
+      const completa = await traerRecetaCompleta(receta.id);
+      navegarA('DetalleReceta', { receta: completa });
+    } catch (e) {
+      Alert.alert('No se pudo abrir la receta', e.message);
+    } finally {
+      setOcupado(false);
+    }
+  };
+
+  const confirmarBorrado = (receta) => {
     Alert.alert(
-      'Eliminar receta',
-      '¿Estás seguro de que quieres eliminar esta receta?',
+      'Borrar receta',
+      'Se va a eliminar "' + receta.nombre + '" con sus ingredientes y sus pasos. No se puede deshacer.',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Eliminar', 
+        {
+          text: 'Borrar',
           style: 'destructive',
-          onPress: () => eliminarReceta(id)
+          onPress: async () => {
+            setOcupado(true);
+            try {
+              await borrarReceta(receta.id);
+              setRecetas(recetas.filter((r) => r.id !== receta.id));
+            } catch (e) {
+              Alert.alert('No se pudo borrar', e.message);
+            } finally {
+              setOcupado(false);
+            }
+          }
         }
       ]
     );
   };
 
-  const renderReceta = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.recetaCard}
-      onPress={() => verDetalle(item)}
-    >
-      <View style={styles.recetaHeader}>
-        <Text style={styles.recetaNombre}>{item.nombre}</Text>
-        <TouchableOpacity 
-          onPress={() => confirmarEliminar(item.id)}
-          style={styles.eliminarBoton}
-        >
-          <Text style={styles.eliminarTexto}>✕</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.recetaInfo}>
-        <Text style={styles.recetaDetalle}>⏱ {item.tiempo}</Text>
-        <Text style={styles.recetaDetalle}>👥 {item.porciones}</Text>
-      </View>
-      <Text style={styles.recetaResumen}>
-        {item.ingredientes.length} ingredientes • {item.pasos.length} pasos
-      </Text>
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={styles.container}>
-      {recetas.length === 0 ? (
-        <View style={styles.vacio}>
-          <Text style={styles.emoji}>🍽️</Text>
-          <Text style={styles.tituloVacio}>No tienes recetas</Text>
-          <Text style={styles.subtituloVacio}>
-            ¡Empieza a crear tus propias recetas desde el inicio!
+  if (!id) {
+    return (
+      <View style={styles.centrado}>
+        <View style={styles.tarjetaVacia}>
+          <Text style={styles.tituloVacio}>No hay sesion abierta</Text>
+          <Text style={styles.textoVacio}>
+            Inicia sesion para ver las recetas que creaste.
           </Text>
-          <TouchableOpacity 
-            style={styles.botonCrear}
-            onPress={() => navegarA('CrearReceta')}
-          >
-            <Text style={styles.botonTexto}>Crear primera receta</Text>
+          <TouchableOpacity style={styles.botonPrincipal} onPress={() => navegarA('Login')}>
+            <Text style={styles.botonPrincipalTexto}>Iniciar sesion</Text>
           </TouchableOpacity>
         </View>
-      ) : (
-        <FlatList
-          data={recetas}
-          renderItem={renderReceta}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.lista}
-        />
-      )}
+      </View>
+    );
+  }
 
-      {/* Modal de detalle */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitulo}>{recetaSeleccionada?.nombre}</Text>
-              
-              <View style={styles.modalInfoRow}>
-                <Text style={styles.modalInfo}>⏱ {recetaSeleccionada?.tiempo}</Text>
-                <Text style={styles.modalInfo}>👥 {recetaSeleccionada?.porciones}</Text>
-              </View>
+  if (cargando) {
+    return (
+      <View style={styles.centrado}>
+        <ActivityIndicator size="large" color={ACENTO} />
+        <Text style={styles.cargandoTexto}>Cargando tus recetas...</Text>
+      </View>
+    );
+  }
 
-              <Text style={styles.modalSubtitulo}>Ingredientes</Text>
-              {recetaSeleccionada?.ingredientes.map((ing, index) => (
-                <Text key={index} style={styles.modalListaItem}>• {ing}</Text>
-              ))}
-
-              <Text style={styles.modalSubtitulo}>Pasos</Text>
-              {recetaSeleccionada?.pasos.map((paso, index) => (
-                <Text key={index} style={styles.modalListaItem}>
-                  {index + 1}. {paso}
-                </Text>
-              ))}
-            </ScrollView>
-
-            <TouchableOpacity 
-              style={styles.modalCerrar}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.modalCerrarTexto}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
+  if (error) {
+    return (
+      <View style={styles.centrado}>
+        <View style={styles.tarjetaVacia}>
+          <Text style={styles.tituloVacio}>No se pudieron traer tus recetas</Text>
+          <Text style={styles.textoVacio}>{error}</Text>
+          <TouchableOpacity style={styles.botonPrincipal} onPress={cargar}>
+            <Text style={styles.botonPrincipalTexto}>Reintentar</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+      </View>
+    );
+  }
+
+  if (recetas.length === 0) {
+    return (
+      <View style={styles.centrado}>
+        <View style={styles.tarjetaVacia}>
+          <Text style={styles.tituloVacio}>Todavia no creaste recetas</Text>
+          <Text style={styles.textoVacio}>
+            Las recetas que crees se guardan en la base de datos y van a aparecer aca.
+          </Text>
+          <TouchableOpacity
+            style={styles.botonPrincipal}
+            onPress={() => navegarA('CrearReceta')}
+          >
+            <Text style={styles.botonPrincipalTexto}>Crear mi primera receta</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.lista}>
+      <Text style={styles.contador}>
+        {recetas.length === 1 ? '1 receta creada' : recetas.length + ' recetas creadas'}
+      </Text>
+
+      {recetas.map((r) => (
+        <Tarjeta
+          key={r.id}
+          receta={r}
+          onAbrir={() => abrir(r)}
+          onBorrar={() => confirmarBorrado(r)}
+        />
+      ))}
+
+      {ocupado ? (
+        <View style={styles.ocupado}>
+          <ActivityIndicator size="small" color={ACENTO} />
+        </View>
+      ) : null}
+
+      <TouchableOpacity
+        style={styles.botonPrincipal}
+        onPress={() => navegarA('CrearReceta')}
+      >
+        <Text style={styles.botonPrincipalTexto}>Crear otra receta</Text>
+      </TouchableOpacity>
+
+      <View style={{ height: 30 }} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#F5F4EE',
+  container: {
+    flex: 1,
+    backgroundColor: FONDO
   },
   lista: {
-    padding: 15,
+    padding: 20
   },
-  recetaCard: {
-    backgroundColor: '#fff',
-    padding: 15,
+  contador: {
+    fontSize: 14,
+    color: ACENTO,
+    fontWeight: '600',
+    marginBottom: 14
+  },
+  tarjeta: {
+    backgroundColor: TARJETA,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E6E4DC',
-    elevation: 2,
+    borderColor: BORDE,
+    overflow: 'hidden',
+    elevation: 2
   },
-  recetaHeader: {
+  tarjetaCuerpo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    padding: 12
   },
-  recetaNombre: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
+  miniatura: {
+    width: 64,
+    height: 64,
+    borderRadius: 10
   },
-  eliminarBoton: {
-    padding: 5,
-  },
-  eliminarTexto: {
-    fontSize: 18,
-    color: '#d9534f',
-    fontWeight: 'bold',
-  },
-  recetaInfo: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  recetaDetalle: {
-    fontSize: 14,
-    color: '#666',
-    marginRight: 15,
-  },
-  recetaResumen: {
-    fontSize: 13,
-    color: '#888',
-  },
-  vacio: {
-    flex: 1,
+  miniaturaSinFoto: {
+    backgroundColor: RESPALDO_FOTO,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
+    paddingHorizontal: 4
   },
-  emoji: {
-    fontSize: 60,
-    marginBottom: 20,
+  miniaturaTexto: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center'
+  },
+  tarjetaTextos: {
+    flex: 1,
+    marginLeft: 14
+  },
+  tarjetaNombre: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: TEXTO
+  },
+  tarjetaCategoria: {
+    fontSize: 13,
+    color: ACENTO,
+    marginTop: 3,
+    fontWeight: '600'
+  },
+  botonBorrar: {
+    borderTopWidth: 1,
+    borderTopColor: BORDE,
+    paddingVertical: 10,
+    alignItems: 'center'
+  },
+  botonBorrarTexto: {
+    color: DESTRUCTIVO,
+    fontSize: 14,
+    fontWeight: '600'
+  },
+  centrado: {
+    flex: 1,
+    backgroundColor: FONDO,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24
+  },
+  tarjetaVacia: {
+    backgroundColor: TARJETA,
+    width: '100%',
+    alignItems: 'center',
+    borderRadius: 15,
+    padding: 26,
+    borderWidth: 1,
+    borderColor: BORDE
   },
   tituloVacio: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: TEXTO,
+    marginBottom: 8,
+    textAlign: 'center'
   },
-  subtituloVacio: {
-    fontSize: 16,
-    color: '#666',
+  textoVacio: {
+    fontSize: 15,
+    color: TEXTO_SUAVE,
     textAlign: 'center',
-    marginBottom: 30,
+    lineHeight: 21
   },
-  botonCrear: {
-    backgroundColor: '#0566b6',
-    paddingVertical: 15,
+  cargandoTexto: {
+    marginTop: 12,
+    color: TEXTO_SUAVE,
+    fontSize: 15
+  },
+  ocupado: {
+    paddingVertical: 14,
+    alignItems: 'center'
+  },
+  botonPrincipal: {
+    backgroundColor: ACENTO,
+    paddingVertical: 14,
     paddingHorizontal: 30,
     borderRadius: 12,
-  },
-  botonTexto: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
-    width: '100%',
-    maxHeight: '80%',
-  },
-  modalTitulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  modalInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  modalInfo: {
-    fontSize: 16,
-    color: '#666',
-    marginHorizontal: 10,
-  },
-  modalSubtitulo: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 15,
-    marginBottom: 8,
-  },
-  modalListaItem: {
-    fontSize: 15,
-    color: '#444',
-    paddingVertical: 3,
-    paddingLeft: 5,
-  },
-  modalCerrar: {
-    backgroundColor: '#0566b6',
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
     marginTop: 20,
+    alignItems: 'center'
   },
-  modalCerrarTexto: {
-    color: '#fff',
+  botonPrincipalTexto: {
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
-  },
+    fontWeight: 'bold'
+  }
 });
