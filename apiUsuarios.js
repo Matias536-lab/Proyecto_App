@@ -3,7 +3,7 @@
 // IMPORTANTE: poner aca la direccion IPv4 de la notebook.
 // Se consigue con el comando ipconfig, en la linea "Direccion IPv4".
 // No sirve localhost: para el celular, localhost es el celular.
-const IP_DE_LA_NOTEBOOK = "10.0.2.36";
+const IP_DE_LA_NOTEBOOK = "192.168.100.44";
 
 const PUERTO = 3000;
 const BASE = "http://" + IP_DE_LA_NOTEBOOK + ":" + PUERTO;

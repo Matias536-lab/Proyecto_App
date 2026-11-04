@@ -128,7 +128,8 @@ export default function App() {
   //   navegarA("Categorias", { categoria: "Desayuno" })
   const navegarA = (pantalla, params = null) => {
     // Si nos mandan un texto suelto, lo convertimos en objeto automáticamente
-    const parametros = typeof params === "string" ? { busqueda: params } : params;
+    const parametros =
+      typeof params === "string" ? { busqueda: params } : params;
 
     setPantallaActual(pantalla);
     setParametrosNavegacion(parametros);
@@ -145,15 +146,21 @@ export default function App() {
         // Si no hay sesión, no tiene sentido mostrar el perfil:
         // mandamos directo a iniciar sesión.
         if (!sesionIniciada) {
-          return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+          return (
+            <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />
+          );
         }
         return <PerfilScreen navegarA={navegarA} usuario={usuario} />;
 
       case "Login":
-        return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+        return (
+          <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />
+        );
 
       case "Registro":
-        return <RegistroScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+        return (
+          <RegistroScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />
+        );
 
       case "Configuracion":
         return (
@@ -168,7 +175,9 @@ export default function App() {
       case "CerrarSesion":
         // Si ya cerró sesión, no hay nada que cerrar.
         if (!sesionIniciada) {
-          return <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />;
+          return (
+            <LoginScreen navegarA={navegarA} iniciarSesion={iniciarSesion} />
+          );
         }
         return <CerrarScreen navegarA={navegarA} cerrarSesion={cerrarSesion} />;
 
@@ -189,20 +198,10 @@ export default function App() {
         );
 
       case "CrearReceta":
-        return (
-          <CrearRecetasScreen
-            navegarA={navegarA}
-            usuario={usuario}
-          />
-        );
+        return <CrearRecetasScreen navegarA={navegarA} usuario={usuario} />;
 
       case "MisRecetas":
-        return (
-          <MisRecetasScreen
-            navegarA={navegarA}
-            usuario={usuario}
-          />
-        );
+        return <MisRecetasScreen navegarA={navegarA} usuario={usuario} />;
 
       case "Categorias":
         return (

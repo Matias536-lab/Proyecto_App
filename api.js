@@ -351,11 +351,6 @@ function armarDescripcion(plato, nombresIngredientes, cantidadPasos) {
     frases.push("Su elaboración se divide en " + cantidadPasos + " pasos.");
   }
 
-  // 4) Aviso de idioma
-  frases.push(
-    "El texto original de la receta está en inglés, tal como lo publica TheMealDB."
-  );
-
   return frases.join(" ");
 }
 
@@ -580,7 +575,7 @@ function convertirSpoonacular(plato) {
     porciones: plato.servings ? plato.servings + " porciones" : "",
     descripcion: resumen
       ? resumen.substring(0, 300) + "..."
-      : "Receta obtenida de Spoonacular. El texto original está en inglés.",
+      : "Receta obtenida de Spoonacular.",
     ingredientes: ingredientes,
     pasos: pasos,
     imagen: plato.image || null,

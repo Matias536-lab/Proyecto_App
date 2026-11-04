@@ -162,7 +162,7 @@ export const RECETAS_LOCALES = [
     nombre: "Milanesa con Puré de Papas",
     categoria: "Almuerzo",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Milanesa_con_pur%C3%A9_de_papas.jpg/960px-Milanesa_con_pur%C3%A9_de_papas.jpg",
+      "https://images.unsplash.com/photo-1652690772758-45df96e11c50?q=80&w=327&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "45 minutos",
     porciones: "4 porciones",
     descripcion:
@@ -193,7 +193,7 @@ export const RECETAS_LOCALES = [
     nombre: "Empanadas de Carne",
     categoria: "Almuerzo",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Bandeja_de_empanadas_argentinas_de_carne_fritas_servidas_con_limones.jpg/960px-Bandeja_de_empanadas_argentinas_de_carne_fritas_servidas_con_limones.jpg",
+      "https://images.unsplash.com/photo-1624128082323-beb6b8b508db?q=80&w=465&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "1 hora 15 minutos",
     porciones: "12 empanadas",
     descripcion:
@@ -314,7 +314,7 @@ export const RECETAS_LOCALES = [
     nombre: "Alfajores de Maicena",
     categoria: "Merienda",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Alfajores-de-maicena-biscuits-recipe.jpg/960px-Alfajores-de-maicena-biscuits-recipe.jpg",
+      "https://images.unsplash.com/photo-1552552492-9c335658343d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "50 minutos",
     porciones: "18 alfajores",
     descripcion:
@@ -345,7 +345,7 @@ export const RECETAS_LOCALES = [
     nombre: "Torta de Chocolate",
     categoria: "Merienda",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Quinoa_Chocolate_Cake_CCBYSA2_Karen_Neo.jpg/960px-Quinoa_Chocolate_Cake_CCBYSA2_Karen_Neo.jpg",
+      "https://plus.unsplash.com/premium_photo-1715015440855-7d95cf92608a?q=80&w=388&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "1 hora",
     porciones: "10 porciones",
     descripcion:
@@ -404,7 +404,8 @@ export const RECETAS_LOCALES = [
     id: "local-14",
     nombre: "Galletitas de Avena",
     categoria: "Merienda",
-    imagen: null,
+    imagen:
+      "https://images.unsplash.com/photo-1600147573971-a2135dbff47e?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "30 minutos",
     porciones: "20 galletitas",
     descripcion:
@@ -434,7 +435,7 @@ export const RECETAS_LOCALES = [
     nombre: "Pastafrola",
     categoria: "Merienda",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Pastafrola.jpg/960px-Pastafrola.jpg",
+      "https://images.unsplash.com/photo-1647540232587-64a11832990d?q=80&w=327&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "1 hora 10 minutos",
     porciones: "10 porciones",
     descripcion:
@@ -466,7 +467,7 @@ export const RECETAS_LOCALES = [
     nombre: "Tarta de Zapallitos y Cebolla",
     categoria: "Cena",
     imagen:
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Tarta_de_zapallitos_redondos_y_cebolla_servida_en_un_buffet.jpg/960px-Tarta_de_zapallitos_redondos_y_cebolla_servida_en_un_buffet.jpg",
+      "https://images.unsplash.com/photo-1619046517985-55260cb2d585?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "50 minutos",
     porciones: "6 porciones",
     descripcion:
@@ -495,7 +496,8 @@ export const RECETAS_LOCALES = [
     id: "local-17",
     nombre: "Pizza Casera de Muzzarella",
     categoria: "Cena",
-    imagen: null,
+    imagen:
+      "https://plus.unsplash.com/premium_photo-1733306588881-0411931d4fed?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "40 minutos",
     porciones: "8 porciones",
     descripcion:
@@ -523,7 +525,8 @@ export const RECETAS_LOCALES = [
     id: "local-18",
     nombre: "Ensalada de Atún, Huevo y Tomate",
     categoria: "Cena",
-    imagen: null,
+    imagen:
+      "https://images.unsplash.com/photo-1604909052743-94e838986d24?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
     tiempo: "15 minutos",
     porciones: "2 porciones",
     descripcion:

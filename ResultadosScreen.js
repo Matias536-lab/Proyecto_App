@@ -45,7 +45,7 @@ export default function ResultadosScreen({ navegarA, busqueda, route, buscarInte
         ? recetasPorCategoria(categoriaBuscada)
         : buscarLocal(textoBuscado);
 
-    // --- BÚSQUEDA EN INTERNET, AUTOMÁTICA ---
+    //BÚSQUEDA EN INTERNET, AUTOMÁTICA
     //
     // Antes esto lo disparaba un botón. Ahora arranca solo, apenas se
     // entra a la pantalla, y corre EN PARALELO con la búsqueda local.

@@ -13,7 +13,7 @@ Hecho con Express y mysql2, escucha en el puerto 3000.
 
 ## Que hay que hacer la primera vez
 
-1. Tener MySQL andando y haber ejecutado base-de-datos.sql (esta en my-app).
+1. Tener MySQL andando y haber ejecutado sql/01-base-de-datos.sql.
 
 2. Crear el usuario de MySQL que usa la API. En Workbench, pestania de consulta
    nueva, reemplazando la clave por la que te paso el equipo:
