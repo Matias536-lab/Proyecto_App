@@ -23,6 +23,8 @@ CREATE TABLE usuarios (
 CREATE TABLE recetas (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   autor_id INT NOT NULL,
+  origen VARCHAR(20) NOT NULL DEFAULT 'usuario',
+  origen_id VARCHAR(60) NULL,
   nombre VARCHAR(150) NOT NULL,
   categoria VARCHAR(20) NOT NULL,
   tiempo VARCHAR(50) NULL,
@@ -37,7 +39,7 @@ CREATE TABLE recetas (
     ON DELETE CASCADE,
 
   CONSTRAINT chk_recetas_categoria
-    CHECK (categoria IN ('Desayuno', 'Almuerzo', 'Merienda', 'Cena'))
+    CHECK (categoria IN ('Desayuno', 'Almuerzo', 'Merienda', 'Cena', 'De internet'))
 ) ENGINE=InnoDB;
 
 
@@ -83,6 +85,7 @@ CREATE TABLE favoritos (
 
 
 CREATE INDEX idx_recetas_autor ON recetas (autor_id);
+CREATE UNIQUE INDEX idx_recetas_origen ON recetas (origen, origen_id);
 CREATE INDEX idx_recetas_categoria ON recetas (categoria);
 CREATE INDEX idx_ingredientes_receta ON ingredientes (receta_id);
 CREATE INDEX idx_pasos_receta ON pasos (receta_id);
